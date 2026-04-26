@@ -1,0 +1,27 @@
+{
+  "name": "Gestion Piscine",
+  "short_name": "Piscine",
+  "description": "Suivi et analyse de la qualité de l'eau de votre piscine",
+  "lang": "fr",
+  "start_url": "./piscine.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0ea5e9",
+  "theme_color": "#0ea5e9",
+  "categories": ["health", "utilities"],
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}
