@@ -1,0 +1,1764 @@
+---
+permalink: /
+---
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Piscine">
+<meta name="theme-color" content="#0ea5e9">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.svg">
+<title>Gestion Piscine</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; }
+  .tab-btn.active { border-bottom: 3px solid #0ea5e9; color: #0ea5e9; font-weight: 600; }
+  .status-ok { background: #dcfce7; color: #166534; }
+  .status-warn { background: #fef9c3; color: #854d0e; }
+  .status-bad { background: #fee2e2; color: #991b1b; }
+  .status-badge { display:inline-block; padding:2px 10px; border-radius:999px; font-size:.75rem; font-weight:600; }
+  input[type=number]::-webkit-inner-spin-button { opacity:1; }
+  .chart-container { position:relative; height:220px; }
+  .task-item { transition: opacity 0.45s, transform 0.45s; }
+  .task-item.completing { opacity:0; transform: translateX(20px); }
+
+  /* ── Scrollbar masqué (navigation onglets) ── */
+  .scrollbar-hide::-webkit-scrollbar { display:none; }
+  .scrollbar-hide { -ms-overflow-style:none; scrollbar-width:none; }
+
+  /* ── Défilement tactile iOS sur les zones scrollables ── */
+  .overflow-x-auto { -webkit-overflow-scrolling:touch; }
+
+  /* ── Taille minimale des zones tactiles (WCAG / Apple HIG) ── */
+  .tab-btn { min-height:44px; white-space:nowrap; }
+  button { -webkit-tap-highlight-color: transparent; }
+
+  /* ── Empêche le zoom automatique iOS sur les <input> ── */
+  @media (max-width:767px) {
+    input, select, textarea { font-size:16px !important; }
+  }
+
+  /* ── Adaptations mobiles ── */
+  @media (max-width:479px) {
+    .chart-container { height:180px; }
+    .ez-bg2 { grid-template-columns:1fr !important; }
+    .al-pg  { grid-template-columns:repeat(2,1fr) !important; }
+  }
+
+  /* ── Safe-area pour appareils avec encoche (iPhone X+) ── */
+  #timerWidget {
+    bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px));
+    right:  calc(1.25rem + env(safe-area-inset-right,  0px));
+  }
+  .footer-safe { padding-bottom: env(safe-area-inset-bottom, 0px); }
+
+  /* ── Toast notification (remplace les alert() de succès) ── */
+  #toast {
+    position:fixed; bottom:calc(5rem + env(safe-area-inset-bottom,0px));
+    left:50%; transform:translateX(-50%) translateY(0);
+    background:#1e293b; color:#fff; padding:.55rem 1.3rem;
+    border-radius:9999px; font-size:.85rem; white-space:nowrap;
+    z-index:9999; pointer-events:none;
+    transition:opacity .3s, transform .3s;
+  }
+  #toast.hidden { opacity:0; transform:translateX(-50%) translateY(8px); }
+
+  /* ═══ FICHES RÉFLEXES — sous-navigation ═══ */
+  .fr-subbtn { border:none; border-bottom:2px solid transparent; background:none; padding:.65rem 1.1rem; font-size:.85rem; font-weight:600; cursor:pointer; color:#6b7280; transition:.2s; }
+  .fr-subbtn.active { border-bottom-color:#0ea5e9; color:#0ea5e9; }
+  .fr-subbtn:hover:not(.active){ color:#111827; }
+
+  /* ═══ AQUALUX ═══ */
+  .al-hdr { background:#052235; padding:1.25rem 1.5rem 0; }
+  .al-wave::after { content:''; display:block; height:28px; background:#f5f0e8; clip-path:ellipse(55% 100% at 50% 100%); margin-top:.9rem; }
+  .al-lbl { font-family:monospace; font-size:.62rem; letter-spacing:.2em; text-transform:uppercase; color:#14b8d4; display:block; margin-bottom:.2rem; }
+  .al-h { font-size:1.35rem; font-weight:800; color:#fff; margin:0; line-height:1.1; }
+  .al-h span { color:#14b8d4; }
+  .al-bdg { background:rgba(20,184,212,.15); border:1px solid rgba(20,184,212,.3); border-radius:8px; padding:.4rem .85rem; text-align:center; }
+  .al-bdg-t { font-family:monospace; font-size:.58rem; color:#14b8d4; letter-spacing:.1em; text-transform:uppercase; display:block; }
+  .al-bdg-v { font-size:1rem; font-weight:700; color:#fff; display:block; }
+  .al-snav { display:flex; gap:.35rem; flex-wrap:wrap; padding:.7rem 1rem 0; }
+  .al-sb { padding:.38rem .85rem; border:none; border-radius:100px; font-size:.78rem; font-weight:600; cursor:pointer; transition:.2s; background:rgba(255,255,255,.08); color:rgba(255,255,255,.6); }
+  .al-sb.active { background:#14b8d4; color:#052235; }
+  .al-sb:hover:not(.active) { background:rgba(255,255,255,.15); color:#fff; }
+  .al-body { padding:.9rem; background:#f5f0e8; }
+  .al-pan { display:none; }
+  .al-pan.active { display:block; }
+
+  .al-card { background:#fff; border-radius:13px; overflow:hidden; margin-bottom:.9rem; box-shadow:0 2px 10px rgba(10,79,110,.08); }
+  .al-ch { padding:.9rem 1.1rem; display:flex; align-items:center; gap:.65rem; }
+  .al-ch-ico { font-size:1.25rem; width:2.1rem; height:2.1rem; border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .al-ch h4 { font-size:.9rem; font-weight:700; flex:1; margin:0; }
+  .al-ch-n { font-family:monospace; font-size:.58rem; letter-spacing:.1em; padding:.12rem .4rem; border-radius:4px; font-weight:500; white-space:nowrap; }
+  .al-cb { padding:0 1.1rem .9rem; }
+  .al-winter .al-ch { background:linear-gradient(135deg,#e8f4ff,#d0e9ff); }
+  .al-winter .al-ch-ico { background:#bfdbfe; } .al-winter .al-ch h4 { color:#1e3a8a; } .al-winter .al-ch-n { background:#bfdbfe; color:#1e40af; }
+  .al-spring .al-ch { background:linear-gradient(135deg,#ecfdf5,#d1fae5); }
+  .al-spring .al-ch-ico { background:#a7f3d0; } .al-spring .al-ch h4 { color:#065f46; } .al-spring .al-ch-n { background:#a7f3d0; color:#064e3b; }
+  .al-daily .al-ch { background:linear-gradient(135deg,#fff7ed,#ffedd5); }
+  .al-daily .al-ch-ico { background:#fed7aa; } .al-daily .al-ch h4 { color:#7c2d12; } .al-daily .al-ch-n { background:#fed7aa; color:#9a3412; }
+  .al-alert .al-ch { background:linear-gradient(135deg,#fef2f2,#fee2e2); }
+  .al-alert .al-ch-ico { background:#fecaca; } .al-alert .al-ch h4 { color:#7f1d1d; } .al-alert .al-ch-n { background:#fecaca; color:#991b1b; }
+  .al-setup .al-ch { background:linear-gradient(135deg,#faf5ff,#ede9fe); }
+  .al-setup .al-ch-ico { background:#ddd6fe; } .al-setup .al-ch h4 { color:#3b0764; } .al-setup .al-ch-n { background:#ddd6fe; color:#4c1d95; }
+
+  .al-steps { list-style:none; margin:0; padding:0; }
+  .al-step { display:flex; gap:.55rem; padding:.45rem 0; border-bottom:1px solid #f3f4f6; align-items:flex-start; font-size:.83rem; line-height:1.5; }
+  .al-step:last-child { border-bottom:none; }
+  .al-sn { font-family:monospace; font-size:.68rem; min-width:1.45rem; height:1.45rem; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; background:#e0f7ff; color:#0d7fa5; font-weight:500; }
+  .al-si { font-size:.9rem; flex-shrink:0; margin-top:2px; }
+  .al-step strong { font-weight:600; color:#0a4f6e; }
+  .al-t { display:inline-block; font-family:monospace; font-size:.64rem; padding:.08rem .32rem; border-radius:3px; font-weight:500; margin:0 1px; }
+  .al-tc { background:#fef9c3; color:#713f12; border:1px solid #fde047; }
+  .al-tok { background:#dcfce7; color:#14532d; border:1px solid #86efac; }
+  .al-tw { background:#fff7ed; color:#7c2d12; border:1px solid #fdba74; }
+  .al-td { background:#fef2f2; color:#7f1d1d; border:1px solid #fca5a5; }
+  .al-pg { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:.45rem; margin:.55rem 0; }
+  .al-pc { border-radius:8px; padding:.6rem; border:1px solid #e5e7eb; }
+  .al-pl { font-family:monospace; font-size:.58rem; text-transform:uppercase; letter-spacing:.08em; color:#6b8fa0; margin-bottom:.12rem; }
+  .al-pv { font-size:.95rem; font-weight:700; color:#0a4f6e; }
+  .al-pu { font-size:.68rem; color:#6b8fa0; }
+  .al-ab { border-radius:7px; padding:.6rem .85rem; margin:.55rem 0; display:flex; gap:.45rem; align-items:flex-start; font-size:.8rem; line-height:1.5; }
+  .al-ab.ok { background:#f0fdf4; border:1px solid #bbf7d0; border-left:3px solid #10b981; }
+  .al-ab.warn { background:#fffbeb; border:1px solid #fde68a; border-left:3px solid #f59e0b; }
+  .al-ab.info { background:#eff6ff; border:1px solid #bfdbfe; border-left:3px solid #0d7fa5; }
+  .al-ab.danger { background:#fef2f2; border:1px solid #fecaca; border-left:3px solid #ef4444; }
+  .al-sl { font-family:monospace; font-size:.58rem; letter-spacing:.15em; text-transform:uppercase; color:#6b8fa0; margin:.7rem 0 .35rem; display:flex; align-items:center; gap:.4rem; }
+  .al-sl::after { content:''; flex:1; height:1px; background:#e5e7eb; }
+  .al-cl { list-style:none; padding:0; margin:0; }
+  .al-cl li { display:flex; align-items:center; gap:.45rem; padding:.38rem 0; font-size:.82rem; border-bottom:1px dashed #e5e7eb; }
+  .al-cl li:last-child { border-bottom:none; }
+  .al-cb2 { width:15px; height:15px; border:2px solid #d1d5db; border-radius:4px; flex-shrink:0; }
+  .al-tbl { width:100%; border-collapse:collapse; font-size:.8rem; }
+  .al-tbl th { font-family:monospace; font-size:.6rem; letter-spacing:.08em; text-transform:uppercase; color:#6b8fa0; padding:.38rem .65rem; text-align:left; border-bottom:2px solid #e5e7eb; }
+  .al-tbl td { padding:.5rem .65rem; border-bottom:1px solid #f3f4f6; vertical-align:top; }
+  .al-tbl tr:last-child td { border-bottom:none; }
+  .al-tbl tr:hover td { background:#f9fafb; }
+
+  /* ═══ EZ-9909SP ═══ */
+  .ez { background:#0d1117; padding:1.5rem 1.25rem 2rem; color:#e6edf3; position:relative; }
+  .ez::before { content:''; position:absolute; inset:0; background-image:linear-gradient(rgba(0,217,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,217,255,.03) 1px,transparent 1px); background-size:40px 40px; pointer-events:none; }
+  .ez > * { position:relative; }
+  .ez-bdg { display:inline-block; font-family:monospace; font-size:.62rem; letter-spacing:.18em; color:#00d9ff; border:1px solid #00d9ff; padding:.2rem .6rem; border-radius:2px; margin-bottom:.7rem; text-transform:uppercase; }
+  .ez-h1 { font-size:clamp(1.5rem,4vw,2rem); font-weight:800; letter-spacing:-.02em; line-height:1.1; margin-bottom:.4rem; }
+  .ez-h1 span { color:#00d9ff; }
+  .ez-sub { color:#8b949e; font-size:.88rem; margin-bottom:1.25rem; }
+  .ez-alr { background:rgba(255,92,92,.07); border:1px solid rgba(255,92,92,.3); border-left:3px solid #ff5c5c; border-radius:6px; padding:.85rem 1rem; margin-bottom:1.25rem; display:flex; gap:.6rem; align-items:flex-start; font-size:.83rem; color:#ffaaaa; line-height:1.5; }
+  .ez-alr strong { color:#ff7f7f; }
+  .ez-inf { background:rgba(0,217,255,.05); border:1px solid rgba(0,217,255,.2); border-left:3px solid #00d9ff; border-radius:6px; padding:.85rem 1rem; margin-bottom:1.25rem; font-size:.83rem; color:#aaddee; line-height:1.5; }
+  .ez-inf strong { color:#00d9ff; }
+  .ez-st { font-family:monospace; font-size:.62rem; letter-spacing:.15em; text-transform:uppercase; color:#8b949e; margin:1.1rem 0 .65rem; display:flex; align-items:center; gap:.45rem; }
+  .ez-st::after { content:''; flex:1; height:1px; background:#30363d; }
+  .ez-mg { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:.55rem; margin-bottom:1.25rem; }
+  .ez-mi { background:#161b22; border:1px solid #30363d; border-radius:8px; padding:.75rem .85rem; display:flex; align-items:center; gap:.5rem; font-size:.83rem; transition:.2s; }
+  .ez-mi:hover { border-color:#00d9ff; background:rgba(0,217,255,.04); }
+  .ez-bg2 { display:grid; grid-template-columns:repeat(3,1fr); gap:.55rem; margin-bottom:1.25rem; }
+  .ez-bc { border-radius:9px; padding:1rem .85rem; text-align:center; border:1px solid transparent; }
+  .ez-bc.p7 { border-color:rgba(78,205,196,.4); background:rgba(78,205,196,.06); }
+  .ez-bc.p4 { border-color:rgba(255,107,107,.4); background:rgba(255,107,107,.06); }
+  .ez-bc.p9 { border-color:rgba(167,139,250,.4); background:rgba(167,139,250,.06); }
+  .ez-bn { font-size:1.7rem; font-weight:800; line-height:1; margin-bottom:.2rem; }
+  .ez-bc.p7 .ez-bn { color:#4ecdc4; } .ez-bc.p4 .ez-bn { color:#ff6b6b; } .ez-bc.p9 .ez-bn { color:#a78bfa; }
+  .ez-bl { font-family:monospace; font-size:.6rem; letter-spacing:.1em; color:#8b949e; text-transform:uppercase; }
+  .ez-bo { display:block; margin-top:.35rem; font-size:.68rem; font-family:monospace; color:#8b949e; }
+  .ez-sb { background:#161b22; border:1px solid #30363d; border-radius:9px; overflow:hidden; margin-bottom:.55rem; transition:.2s; }
+  .ez-sb:hover { border-color:rgba(0,217,255,.3); }
+  .ez-sh { display:flex; align-items:center; gap:.7rem; padding:.75rem 1.05rem; }
+  .ez-sn { font-family:monospace; font-size:.62rem; font-weight:500; padding:.12rem .42rem; border-radius:4px; flex-shrink:0; }
+  .ez-sb.s1 .ez-sn { background:rgba(78,205,196,.15); color:#4ecdc4; }
+  .ez-sb.s2 .ez-sn { background:rgba(255,107,107,.15); color:#ff6b6b; }
+  .ez-sb.s3 .ez-sn { background:rgba(167,139,250,.15); color:#a78bfa; }
+  .ez-st2 { font-weight:500; font-size:.9rem; flex:1; }
+  .ez-sbdg { font-family:monospace; font-size:.6rem; letter-spacing:.08em; padding:.1rem .42rem; border-radius:3px; }
+  .ez-sb.s1 .ez-sbdg { color:#4ecdc4; border:1px solid rgba(78,205,196,.3); }
+  .ez-sb.s2 .ez-sbdg { color:#ff6b6b; border:1px solid rgba(255,107,107,.3); }
+  .ez-sb.s3 .ez-sbdg { color:#a78bfa; border:1px solid rgba(167,139,250,.3); }
+  .ez-sbody { padding:.1rem 1.05rem .85rem; border-top:1px solid #30363d; }
+  .ez-ss { display:flex; align-items:flex-start; gap:.6rem; padding:.48rem 0; border-bottom:1px dashed rgba(255,255,255,.05); font-size:.83rem; line-height:1.5; }
+  .ez-ss:last-child { border-bottom:none; }
+  .ez-si { font-size:.88rem; flex-shrink:0; margin-top:2px; }
+  .ez-pass { display:inline-block; font-family:monospace; font-size:.66rem; font-weight:500; color:#00ff88; border:1px solid rgba(0,255,136,.4); padding:.07rem .32rem; border-radius:3px; margin-left:.2rem; background:rgba(0,255,136,.05); }
+  .ez-key { display:inline-block; font-family:monospace; font-size:.68rem; color:#ffcc00; background:rgba(255,204,0,.1); border:1px solid rgba(255,204,0,.3); padding:.07rem .32rem; border-radius:3px; }
+  .ez-pt { width:100%; border-collapse:collapse; font-size:.83rem; margin-bottom:1.25rem; }
+  .ez-pt th { font-family:monospace; font-size:.62rem; letter-spacing:.1em; text-transform:uppercase; color:#8b949e; padding:.55rem .85rem; text-align:left; border-bottom:1px solid #30363d; }
+  .ez-pt td { padding:.7rem .85rem; border-bottom:1px solid rgba(255,255,255,.04); vertical-align:middle; }
+  .ez-pt tr:last-child td { border-bottom:none; }
+  .ez-pt tr:hover td { background:rgba(255,255,255,.02); }
+  .ez-dot { display:inline-block; width:6px; height:6px; border-radius:50%; margin-right:.4rem; vertical-align:middle; }
+  .ez-dot.g { background:#00ff88; } .ez-dot.y { background:#ffcc00; }
+</style>
+</head>
+<body class="bg-sky-50 min-h-screen">
+
+<!-- Header -->
+<div class="bg-gradient-to-r from-sky-600 to-cyan-500 text-white px-6 py-4 shadow-md">
+  <div class="max-w-4xl mx-auto flex items-center gap-3">
+    <span class="text-3xl">🏊</span>
+    <div>
+      <h1 class="text-xl font-bold">Gestion Piscine</h1>
+      <p class="text-sky-100 text-sm" id="poolSummary">Configurer les dimensions dans Paramètres</p>
+    </div>
+  </div>
+</div>
+
+<!-- Tabs -->
+<div class="max-w-4xl mx-auto px-4 mt-4">
+  <div class="flex border-b border-gray-200 bg-white rounded-t-xl overflow-x-auto scrollbar-hide">
+    <button class="tab-btn active px-4 py-3 text-sm border-b-0 flex-shrink-0" onclick="showTab('saisie')">📋 Saisie</button>
+    <button class="tab-btn px-4 py-3 text-sm border-b-0 flex-shrink-0" onclick="showTab('historique')">📊 Historique</button>
+    <button class="tab-btn px-4 py-3 text-sm border-b-0 flex-shrink-0" onclick="showTab('graphiques')">📈 Graphiques</button>
+    <button class="tab-btn px-4 py-3 text-sm border-b-0 flex-shrink-0" onclick="showTab('parametres')">⚙️ Paramètres</button>
+    <button class="tab-btn px-4 py-3 text-sm border-b-0 flex-shrink-0" onclick="showTab('fiches')">📚 Fiches</button>
+    <button class="tab-btn px-4 py-3 text-sm border-b-0 flex-shrink-0" onclick="showTab('taches')">🗒️ Tâches <span id="taskBadge" class="hidden ml-1 bg-red-500 text-white text-xs font-bold rounded-full px-1.5 py-0.5">0</span></button>
+    <button class="tab-btn px-4 py-3 text-sm border-b-0 flex-shrink-0" onclick="showTab('etalonnage')">🔧 Étalonnage</button>
+    <button class="ml-auto px-4 py-3 text-sm text-sky-600 hover:text-sky-800 font-medium flex-shrink-0 min-h-[44px]" onclick="timerShow()">⏱</button>
+  </div>
+
+  <!-- TAB SAISIE -->
+  <div id="tab-saisie" class="bg-white rounded-b-xl shadow p-6">
+    <h2 class="text-lg font-semibold text-gray-700 mb-4">Nouvelle mesure</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm text-gray-600 mb-1">Date & heure</label>
+        <input type="datetime-local" id="inputDate" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400">
+      </div>
+      <div>
+        <label class="block text-sm text-gray-600 mb-1">pH <span class="text-gray-400">(idéal : 7.2 – 7.6)</span></label>
+        <input type="number" id="inputPH" step="0.1" min="0" max="14" placeholder="ex: 7.4" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400">
+      </div>
+      <div>
+        <label class="block text-sm text-gray-600 mb-1">TDS <span class="text-gray-400">(ppm, idéal &lt; 1500)</span></label>
+        <input type="number" id="inputTDS" step="1" min="0" placeholder="ex: 800" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400">
+      </div>
+      <div>
+        <label class="block text-sm text-gray-600 mb-1">Conductivité <span class="text-gray-400">(µS/cm, idéal 200–800)</span></label>
+        <input type="number" id="inputCond" step="1" min="0" placeholder="ex: 450" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400">
+      </div>
+      <div>
+        <label class="block text-sm text-gray-600 mb-1">Salinité <span class="text-gray-400">(ppm)</span></label>
+        <input type="number" id="inputSalPPM" step="1" min="0" placeholder="ex: 3500" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400">
+      </div>
+      <div>
+        <label class="block text-sm text-gray-600 mb-1">Salinité <span class="text-gray-400">(%)</span></label>
+        <input type="number" id="inputSalPct" step="0.01" min="0" placeholder="ex: 0.35" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400">
+      </div>
+      <div>
+        <label class="block text-sm text-gray-600 mb-1">Température <span class="text-gray-400">(°C, confort 24–28)</span></label>
+        <input type="number" id="inputTemp" step="0.1" min="0" max="45" placeholder="ex: 26" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400">
+      </div>
+    </div>
+    <div class="mt-4">
+      <label class="block text-sm text-gray-600 mb-1">Notes (facultatif)</label>
+      <input type="text" id="inputNotes" placeholder="Ex: après traitement chlore…" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400">
+    </div>
+
+    <button onclick="saveMeasure()" class="mt-5 bg-sky-600 hover:bg-sky-700 text-white px-6 py-2 rounded-lg font-semibold text-sm transition">💾 Enregistrer la mesure</button>
+
+    <!-- Recommandations en temps réel -->
+    <div id="liveReco" class="mt-6 hidden">
+      <h3 class="text-base font-semibold text-gray-700 mb-3">🔬 Analyse & Recommandations</h3>
+      <div id="recoContent"></div>
+    </div>
+  </div>
+
+  <!-- TAB HISTORIQUE -->
+  <div id="tab-historique" class="bg-white rounded-b-xl shadow p-6 hidden">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-lg font-semibold text-gray-700">Historique des mesures</h2>
+      <button onclick="clearHistory()" class="text-xs text-red-500 hover:text-red-700 border border-red-300 px-3 py-1 rounded">🗑 Tout effacer</button>
+    </div>
+    <div id="historyTable" class="overflow-x-auto -mx-2 px-2"></div>
+  </div>
+
+  <!-- TAB GRAPHIQUES -->
+  <div id="tab-graphiques" class="bg-white rounded-b-xl shadow p-6 hidden">
+    <h2 class="text-lg font-semibold text-gray-700 mb-4">Évolution dans le temps</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <p class="text-sm font-medium text-gray-600 mb-1">pH</p>
+        <div class="chart-container"><canvas id="chartPH"></canvas></div>
+      </div>
+      <div>
+        <p class="text-sm font-medium text-gray-600 mb-1">TDS (ppm)</p>
+        <div class="chart-container"><canvas id="chartTDS"></canvas></div>
+      </div>
+      <div>
+        <p class="text-sm font-medium text-gray-600 mb-1">Conductivité (µS/cm)</p>
+        <div class="chart-container"><canvas id="chartCond"></canvas></div>
+      </div>
+      <div>
+        <p class="text-sm font-medium text-gray-600 mb-1">Salinité (ppm)</p>
+        <div class="chart-container"><canvas id="chartSal"></canvas></div>
+      </div>
+      <div>
+        <p class="text-sm font-medium text-gray-600 mb-1">Température (°C)</p>
+        <div class="chart-container"><canvas id="chartTemp"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB FICHES RÉFLEXES -->
+  <div id="tab-fiches" class="bg-white rounded-b-xl shadow hidden overflow-hidden">
+    <!-- Sous-navigation -->
+    <div class="flex border-b border-gray-200 bg-white px-2">
+      <button class="fr-subbtn active" onclick="showFiche('aqualux',this)">🌊 DUO AQUALUX</button>
+      <button class="fr-subbtn" onclick="showFiche('etalonnage',this)">🔬 Étalonnage EZ-9909SP</button>
+    </div>
+
+    <!-- ── AQUALUX ── -->
+    <div id="fr-aqualux" class="fr-sec">
+      <div class="al-hdr al-wave">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap">
+          <div><span class="al-lbl">Fiches Réflexes · Piscine au sel</span><h3 class="al-h">DUO <span>AQUALUX</span></h3></div>
+          <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+            <div class="al-bdg"><span class="al-bdg-t">Sel cible</span><span class="al-bdg-v">5 kg/m³</span></div>
+            <div class="al-bdg"><span class="al-bdg-t">pH cible</span><span class="al-bdg-v">7,0 – 7,4</span></div>
+            <div class="al-bdg"><span class="al-bdg-t">Chlore libre</span><span class="al-bdg-v">0,5 – 1 ppm</span></div>
+          </div>
+        </div>
+        <div class="al-snav">
+          <button class="al-sb active" onclick="showAlTab('quotidien',this)">📅 Quotidien</button>
+          <button class="al-sb" onclick="showAlTab('sortie',this)">🌱 Sortie d'hivernage</button>
+          <button class="al-sb" onclick="showAlTab('hivernage',this)">❄️ Mise en hivernage</button>
+          <button class="al-sb" onclick="showAlTab('alarmes',this)">🚨 Alarmes</button>
+        </div>
+      </div>
+      <div class="al-body">
+
+        <!-- QUOTIDIEN -->
+        <div id="al-quotidien" class="al-pan active">
+          <div class="al-card al-daily">
+            <div class="al-ch"><div class="al-ch-ico">📊</div><h4>Contrôle journalier — Vérifications visuelles</h4><span class="al-ch-n">QUOTIDIEN</span></div>
+            <div class="al-cb">
+              <div class="al-ab ok"><span>✅</span><span>L'AQUALUX gère automatiquement le pH et le chlore. Le contrôle visuel quotidien suffit en période normale.</span></div>
+              <ul class="al-cl">
+                <li><div class="al-cb2"></div><span>Eau limpide, absence d'algues ou de trouble</span></li>
+                <li><div class="al-cb2"></div><span>Boîtier AQUALUX allumé, pas de voyant alarme rouge</span></li>
+                <li><div class="al-cb2"></div><span>Pompe pH — bidon correcteur non vide</span></li>
+                <li><div class="al-cb2"></div><span>Filtration en fonctionnement</span></li>
+              </ul>
+            </div>
+          </div>
+          <div class="al-card al-daily">
+            <div class="al-ch"><div class="al-ch-ico">🧪</div><h4>Contrôle hebdomadaire — Analyse eau</h4><span class="al-ch-n">CHAQUE SEMAINE</span></div>
+            <div class="al-cb">
+              <div class="al-ab warn"><span>⚠️</span><span>Aqualux recommande un contrôle manuel chaque semaine même avec régulation automatique.</span></div>
+              <div class="al-sl">Valeurs à vérifier</div>
+              <div class="al-pg">
+                <div class="al-pc"><div class="al-pl">pH</div><div class="al-pv">7,0 – 7,4</div><div class="al-pu">Consigne réglée à 7,2</div></div>
+                <div class="al-pc"><div class="al-pl">Chlore libre</div><div class="al-pv">0,5 – 1</div><div class="al-pu">ppm (mg/L)</div></div>
+                <div class="al-pc"><div class="al-pl">Salinité</div><div class="al-pv">4 – 6</div><div class="al-pu">kg/m³ (cible 5)</div></div>
+                <div class="al-pc"><div class="al-pl">Température</div><div class="al-pv">&gt; 15°C</div><div class="al-pu">Min. électrolyse</div></div>
+              </div>
+              <div class="al-sl">Actions selon résultats</div>
+              <ul class="al-steps">
+                <li class="al-step"><span class="al-si">💧</span><span><strong>pH trop haut (&gt;7,4)</strong> — L'AQUALUX injecte automatiquement du pH-. Si inactif, vérifier bidon correcteur et sonde. Menu <span class="al-t al-tc">Ad</span> pour ajuster l'affichage.</span></li>
+                <li class="al-step"><span class="al-si">💧</span><span><strong>pH trop bas (&lt;7,0)</strong> — Ajouter du pH+ manuellement aux buses de refoulement. Attendre 30 min.</span></li>
+                <li class="al-step"><span class="al-si">🔵</span><span><strong>Chlore insuffisant (&lt;0,5 ppm)</strong> — Augmenter le % de production avec la touche <span class="al-t al-tc">▲</span> ou activer le mode <span class="al-t al-tc">BOOST</span>.</span></li>
+                <li class="al-step"><span class="al-si">🧂</span><span><strong>Sel bas (&lt;4 kg/m³)</strong> — Ajouter du sel pastille haute pureté norme EN 16401 Qualité A. Filtration 24h, appareil éteint.</span></li>
+              </ul>
+            </div>
+          </div>
+          <div class="al-card al-daily">
+            <div class="al-ch"><div class="al-ch-ico">⏱️</div><h4>Durée de filtration selon température</h4><span class="al-ch-n">RÉGLAGE</span></div>
+            <div class="al-cb">
+              <div class="al-pg" style="grid-template-columns:repeat(auto-fit,minmax(80px,1fr))">
+                <div class="al-pc"><div class="al-pl">16°C</div><div class="al-pv">8h</div></div>
+                <div class="al-pc"><div class="al-pl">18°C</div><div class="al-pv">9h</div></div>
+                <div class="al-pc"><div class="al-pl">20°C</div><div class="al-pv">10h</div></div>
+                <div class="al-pc"><div class="al-pl">22°C</div><div class="al-pv">11h</div></div>
+                <div class="al-pc"><div class="al-pl">24°C</div><div class="al-pv">12h</div></div>
+                <div class="al-pc"><div class="al-pl">26°C</div><div class="al-pv">13h</div></div>
+                <div class="al-pc"><div class="al-pl">28°C</div><div class="al-pv">16h</div></div>
+                <div class="al-pc"><div class="al-pl">30°C+</div><div class="al-pv">24h</div></div>
+              </div>
+              <div class="al-ab info"><span>ℹ️</span><span>Régler la filtration sur <strong>AUTO</strong> une fois le taux de chlore libre supérieur à 1 ppm.</span></div>
+            </div>
+          </div>
+          <div class="al-card al-daily">
+            <div class="al-ch"><div class="al-ch-ico">⚡</div><h4>Mode BOOST — Super-chloration</h4><span class="al-ch-n">SI BESOIN</span></div>
+            <div class="al-cb">
+              <div class="al-ab warn"><span>⚠️</span><span>Mode préventif uniquement — ne remplace pas un traitement choc classique si l'eau est impropre à la baignade.</span></div>
+              <ul class="al-steps">
+                <li class="al-step"><span class="al-sn">1</span><span>Activer quand : fortes pluies, eau trouble, fréquentation exceptionnelle</span></li>
+                <li class="al-step"><span class="al-sn">2</span><span>Mettre la filtration en mode <strong>Manuel 24h</strong></span></li>
+                <li class="al-step"><span class="al-sn">3</span><span>Afficher le mode électrolyse (touche <span class="al-t al-tc">C</span>)</span></li>
+                <li class="al-step"><span class="al-sn">4</span><span>Appuyer <strong>une fois</strong> sur <span class="al-t al-tc">V</span> → affichage <span class="al-t al-tok">bo</span></span></li>
+                <li class="al-step"><span class="al-sn">5</span><span>Production passe à 100% pour le reste de la journée ou 24h en continu</span></li>
+                <li class="al-step"><span class="al-sn">✕</span><span>Pour interrompre : appuyer sur <span class="al-t al-tc">V</span></span></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- SORTIE HIVERNAGE -->
+        <div id="al-sortie" class="al-pan">
+          <div class="al-card al-spring">
+            <div class="al-ch"><div class="al-ch-ico">🌡️</div><h4>Conditions requises avant remise en service</h4><span class="al-ch-n">PRÉREQUIS</span></div>
+            <div class="al-cb">
+              <div class="al-ab danger"><span>🚫</span><span><strong>Température eau &gt; 15°C obligatoire</strong> — En dessous, usure prématurée de la cellule + annulation de garantie.</span></div>
+              <div class="al-pg">
+                <div class="al-pc"><div class="al-pl">Température eau</div><div class="al-pv">&gt; 15°C</div><div class="al-pu">Minimum absolu</div></div>
+                <div class="al-pc"><div class="al-pl">État eau</div><div class="al-pv">Limpide</div><div class="al-pu">Sans algues ni sédiments</div></div>
+                <div class="al-pc"><div class="al-pl">Stabilisant</div><div class="al-pv">&lt; 35</div><div class="al-pu">ppm (mg/L)</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="al-card al-spring">
+            <div class="al-ch"><div class="al-ch-ico">🧪</div><h4>Étape 1 — Analyse et correction eau</h4><span class="al-ch-n">AVANT MISE SOUS TENSION</span></div>
+            <div class="al-cb">
+              <ul class="al-steps">
+                <li class="al-step"><span class="al-sn">1</span><span>Mesurer <strong>pH</strong> (cible 7,0–7,4), <strong>chlore libre</strong> (cible &gt;1 ppm), <strong>salinité</strong> (cible 5 kg/m³), <strong>TAC</strong> et <strong>TH</strong></span></li>
+                <li class="al-step"><span class="al-sn">2</span><span>Corriger le <strong>pH</strong> si nécessaire avec pH+ ou pH- directement aux buses de refoulement</span></li>
+                <li class="al-step"><span class="al-sn">3</span><span>Si <strong>chlore libre &lt; 1 ppm</strong> → effectuer un <strong>choc chlore classique</strong> avant mise en route</span></li>
+                <li class="al-step"><span class="al-sn">4</span><span>Si <strong>sel insuffisant</strong> → ajouter sel pastille EN 16401 Qualité A. Filtration 24h <strong>appareil éteint</strong></span></li>
+                <li class="al-step"><span class="al-sn">5</span><span>Si <strong>eau trouble ou algues</strong> → traitement choc + filtration 24h avant toute mise en route</span></li>
+              </ul>
+              <div class="al-ab info"><span>🧂</span><span>Rappel quantité sel : <strong>Sel à ajouter (kg) = (5 − taux actuel) × volume piscine (m³)</strong></span></div>
+            </div>
+          </div>
+          <div class="al-card al-spring">
+            <div class="al-ch"><div class="al-ch-ico">🔌</div><h4>Étape 2 — Réinstallation sonde pH</h4><span class="al-ch-n">MÉCANIQUE</span></div>
+            <div class="al-cb">
+              <ul class="al-steps">
+                <li class="al-step"><span class="al-sn">1</span><span>Récupérer la sonde conservée dans sa <strong>protection remplie d'eau de ville</strong></span></li>
+                <li class="al-step"><span class="al-sn">2</span><span>Retirer le <strong>bouchon obturateur</strong> de la canalisation (posé en hivernage)</span></li>
+                <li class="al-step"><span class="al-sn">3</span><span>Rincer la sonde à l'eau claire</span></li>
+                <li class="al-step"><span class="al-sn">4</span><span>Remonter la sonde sur le porte-sonde (avec téflon) — veiller qu'elle <strong>ne soit pas en butée</strong></span></li>
+                <li class="al-step"><span class="al-sn">5</span><span>Reconnecter le câble BNC sous le boîtier électronique</span></li>
+                <li class="al-step"><span class="al-sn">6</span><span>Remettre le bidon de correcteur pH en place — <strong>pas directement sous l'appareil</strong></span></li>
+                <li class="al-step"><span class="al-sn">7</span><span>Vérifier le tuyau souple de la pompe péristaltique — pas de fissure ni obstruction</span></li>
+              </ul>
+            </div>
+          </div>
+          <div class="al-card al-spring">
+            <div class="al-ch"><div class="al-ch-ico">⚙️</div><h4>Étape 3 — Mise sous tension et paramétrage</h4><span class="al-ch-n">BOÎTIER</span></div>
+            <div class="al-cb">
+              <ul class="al-steps">
+                <li class="al-step"><span class="al-sn">1</span><span>Appuyer 3s sur <span class="al-t al-tc">C</span> pour allumer → chenillard puis version logiciel</span></li>
+                <li class="al-step"><span class="al-sn">2</span><span>Si affichage <span class="al-t al-tw">CA</span> → étalonnage sonde pH requis (voir fiche étalonnage ci-dessous)</span></li>
+                <li class="al-step"><span class="al-sn">3</span><span>Vérifier/régler le <strong>volume du bassin</strong> → menu pH, code <span class="al-t al-tc">CP</span></span></li>
+                <li class="al-step"><span class="al-sn">4</span><span>Vérifier la <strong>consigne pH</strong> → menu pH, code <span class="al-t al-tc">SE</span> (défaut 7,2 — plage 6,8–7,6)</span></li>
+                <li class="al-step"><span class="al-sn">5</span><span>Vérifier le <strong>type de correcteur</strong> → menu pH, code <span class="al-t al-tc">Co</span> (acide = pH−, basique = pH+)</span></li>
+                <li class="al-step"><span class="al-sn">6</span><span>Amorcer la pompe pH → menu pH, code <span class="al-t al-tc">MA</span> — durée 0 à 9,5 min</span></li>
+                <li class="al-step"><span class="al-sn">7</span><span>Régler le <strong>% production chlore</strong> sur 10 (100%) → laisser tourner jusqu'à chlore &gt;1 ppm</span></li>
+                <li class="al-step"><span class="al-sn">8</span><span>Vérifier la <strong>fréquence d'inversion</strong> cellule → menu sel, code <span class="al-t al-tc">In</span> (selon dureté eau)</span></li>
+              </ul>
+            </div>
+          </div>
+          <div class="al-card al-spring">
+            <div class="al-ch"><div class="al-ch-ico">🔬</div><h4>Étape 4 — Étalonnage sonde pH boîtier AQUALUX</h4><span class="al-ch-n">§ 6.3 NOTICE</span></div>
+            <div class="al-cb">
+              <div class="al-ab warn"><span>⚠️</span><span>Solutions étalons <strong>pH7 et pH10</strong> fournies avec l'appareil (réf. PDSTPH7 / PDSTPH10). Différentes des solutions pour l'EZ-9909SP !</span></div>
+              <ul class="al-steps">
+                <li class="al-step"><span class="al-sn">1</span><span>Dévisser et retirer la sonde du porte-sonde. Obstruer l'orifice avec le <strong>bouchon fourni</strong></span></li>
+                <li class="al-step"><span class="al-sn">2</span><span>Écran : affichage pH → appuyer <strong>3s sur V</strong> → code <span class="al-t al-tc">CA</span> → valider <span class="al-t al-tc">V</span></span></li>
+                <li class="al-step"><span class="al-sn">3</span><span>Écran clignote <span class="al-t al-tok">7.0</span> → plonger sonde dans <strong>solution pH7</strong>, attendre 1 min → valider <span class="al-t al-tc">V</span></span></li>
+                <li class="al-step"><span class="al-sn">4</span><span>Affichage alternatif <span class="al-t al-tok">7.0</span> / <span class="al-t al-tw">--</span> pendant 1 à 5 min → succès : <span class="al-t al-tok">Oh</span> puis affichage <span class="al-t al-tok">10</span></span></li>
+                <li class="al-step"><span class="al-sn">5</span><span>Rincer la sonde à l'eau → égoutter sans sécher</span></li>
+                <li class="al-step"><span class="al-sn">6</span><span>Plonger dans <strong>solution pH10</strong>, attendre 1 min → valider <span class="al-t al-tc">V</span></span></li>
+                <li class="al-step"><span class="al-sn">7</span><span>Affichage alternatif <span class="al-t al-tok">10</span> / <span class="al-t al-tw">--</span> → succès : <span class="al-t al-tok">Oh</span> → retour affichage pH</span></li>
+                <li class="al-step"><span class="al-sn">!</span><span>Si <span class="al-t al-td">Er</span> → sonde en fin de vie → contacter professionnel (réf. sonde PDEPH)</span></li>
+                <li class="al-step"><span class="al-sn">8</span><span>Retirer le bouchon, remettre la sonde sur le porte-sonde</span></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- HIVERNAGE -->
+        <div id="al-hivernage" class="al-pan">
+          <div class="al-card al-winter">
+            <div class="al-ch"><div class="al-ch-ico">❄️</div><h4>Hivernage actif — Principe</h4><span class="al-ch-n">INFO</span></div>
+            <div class="al-cb">
+              <div class="al-ab ok"><span>ℹ️</span><span><strong>Hivernage actif</strong> : la filtration tourne en continu (mode antigel) mais l'électrolyseur est mis en veille. Traitement chimique classique sans stabilisant.</span></div>
+              <div class="al-ab danger"><span>🚫</span><span><strong>Déclencheur obligatoire : eau &lt; 15°C</strong> — Ne pas attendre. L'utilisation en dessous annule la garantie de la cellule.</span></div>
+            </div>
+          </div>
+          <div class="al-card al-winter">
+            <div class="al-ch"><div class="al-ch-ico">🔌</div><h4>Étape 1 — Arrêt du DUO AQUALUX</h4><span class="al-ch-n">BOÎTIER</span></div>
+            <div class="al-cb">
+              <ul class="al-steps">
+                <li class="al-step"><span class="al-sn">1</span><span><strong>Mettre l'électrolyse en veille</strong> : régler le % de production sur <span class="al-t al-tc">00</span> (0%) avec la touche <span class="al-t al-tc">▲</span>. L'écran affiche <span class="al-t al-tw">OF</span></span></li>
+                <li class="al-step"><span class="al-sn">2</span><span><strong>Mettre le pH en veille</strong> : appuyer 3s sur <span class="al-t al-tc">C</span> → écran clignote <span class="al-t al-tw">OF</span> → valider <span class="al-t al-tc">V</span></span></li>
+                <li class="al-step"><span class="al-sn">3</span><span>Vérifier que les <strong>deux fonctions sont bien en veille</strong> (affichage OF)</span></li>
+                <li class="al-step"><span class="al-sn">!</span><span>La <strong>cellule peut rester sur la canalisation</strong> — elle ne sera pas endommagée si non alimentée</span></li>
+                <li class="al-step"><span class="al-sn">!</span><span>S'assurer que l'eau ne peut <strong>pas geler dans la cellule</strong></span></li>
+              </ul>
+            </div>
+          </div>
+          <div class="al-card al-winter">
+            <div class="al-ch"><div class="al-ch-ico">🌡️</div><h4>Étape 2 — Dépose et conservation sonde pH</h4><span class="al-ch-n">MÉCANIQUE</span></div>
+            <div class="al-cb">
+              <ul class="al-steps">
+                <li class="al-step"><span class="al-sn">1</span><span>Déconnecter le câble BNC de la sonde</span></li>
+                <li class="al-step"><span class="al-sn">2</span><span>Dévisser l'écrou et retirer la sonde du porte-sonde</span></li>
+                <li class="al-step"><span class="al-sn">3</span><span>Remplir la <strong>protection caoutchouc d'origine</strong> avec de l'eau du robinet (ou placer dans un verre d'eau)</span></li>
+                <li class="al-step"><span class="al-sn">4</span><span>Conserver dans un <strong>endroit hors gel</strong></span></li>
+                <li class="al-step"><span class="al-sn">5</span><span>Obstruer l'orifice de la canalisation avec le <strong>bouchon fourni</strong></span></li>
+              </ul>
+              <div class="al-ab danger"><span>🚫</span><span>Ne jamais stocker la sonde à sec ni au gel — membrane irrémédiablement endommagée.</span></div>
+            </div>
+          </div>
+          <div class="al-card al-winter">
+            <div class="al-ch"><div class="al-ch-ico">💊</div><h4>Étape 3 — Rinçage pompe péristaltique</h4><span class="al-ch-n">POMPE pH</span></div>
+            <div class="al-cb">
+              <ul class="al-steps">
+                <li class="al-step"><span class="al-sn">1</span><span>Remplacer le bidon de correcteur pH par un <strong>bidon d'eau claire</strong></span></li>
+                <li class="al-step"><span class="al-sn">2</span><span>Aller dans le menu pH → code <span class="al-t al-tc">MA</span> → lancer injection pendant <strong>2–3 minutes</strong></span></li>
+                <li class="al-step"><span class="al-sn">3</span><span>Le tuyau souple est rincé et ne risque plus d'être attaqué par l'acide pendant l'hiver</span></li>
+                <li class="al-step"><span class="al-sn">4</span><span>Retirer le bidon d'eau</span></li>
+              </ul>
+            </div>
+          </div>
+          <div class="al-card al-winter">
+            <div class="al-ch"><div class="al-ch-ico">🧂</div><h4>Étape 4 — Traitement hivernal (actif)</h4><span class="al-ch-n">CHIMIE</span></div>
+            <div class="al-cb">
+              <div class="al-ab info"><span>ℹ️</span><span>L'électrolyseur arrêté, passer en traitement chimique classique <strong>sans stabilisant</strong> pour l'hiver.</span></div>
+              <ul class="al-steps">
+                <li class="al-step"><span class="al-sn">1</span><span>Vérifier le pH (7,0–7,4) et ajuster manuellement</span></li>
+                <li class="al-step"><span class="al-sn">2</span><span>Maintenir un taux de <strong>chlore résiduel</strong> avec pastilles ou granulés sans stabilisant</span></li>
+                <li class="al-step"><span class="al-sn">3</span><span>Ajouter un produit <strong>anti-algues hivernal</strong> selon dosage fabricant</span></li>
+                <li class="al-step"><span class="al-sn">4</span><span>Laisser la filtration tourner en mode <strong>antigel</strong> (selon thermostat ou minuterie)</span></li>
+                <li class="al-step"><span class="al-sn">5</span><span>Vérifier le niveau d'eau régulièrement — compléter si besoin</span></li>
+              </ul>
+            </div>
+          </div>
+          <div class="al-card al-winter">
+            <div class="al-ch"><div class="al-ch-ico">📋</div><h4>Checklist récapitulative — Hivernage actif</h4><span class="al-ch-n">VALIDATION</span></div>
+            <div class="al-cb">
+              <ul class="al-cl">
+                <li><div class="al-cb2"></div><span>Électrolyse en veille (OF affiché)</span></li>
+                <li><div class="al-cb2"></div><span>Régulation pH en veille (OF affiché)</span></li>
+                <li><div class="al-cb2"></div><span>Sonde pH déposée et conservée dans eau non congelée</span></li>
+                <li><div class="al-cb2"></div><span>Bouchon obturateur posé sur le porte-sonde</span></li>
+                <li><div class="al-cb2"></div><span>Pompe péristaltique rincée à l'eau claire</span></li>
+                <li><div class="al-cb2"></div><span>Cellule d'électrolyse : eau non exposée au gel</span></li>
+                <li><div class="al-cb2"></div><span>Traitement chimique hivernal sans stabilisant en cours</span></li>
+                <li><div class="al-cb2"></div><span>Filtration antigel active</span></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- ALARMES -->
+        <div id="al-alarmes" class="al-pan">
+          <div class="al-card al-alert">
+            <div class="al-ch"><div class="al-ch-ico">🚨</div><h4>Lecture des alarmes — Voyants et affichages</h4><span class="al-ch-n">DIAGNOSTIC</span></div>
+            <div class="al-cb">
+              <div class="al-ab warn"><span>⚠️</span><span>Le voyant alarme rouge allumé + affichage <span class="al-t al-td">AL</span> = anomalie détectée. Production chlore interrompue.</span></div>
+              <table class="al-tbl">
+                <thead><tr><th>Code</th><th>Cause</th><th>Action</th></tr></thead>
+                <tbody>
+                  <tr><td><span class="al-t al-td">A1</span> Manque eau</td><td>Pas de débit dans la cellule</td><td>Vérifier que la pompe tourne et que la cellule n'est pas obstruée</td></tr>
+                  <tr><td><span class="al-t al-td">A1</span> Manque sel</td><td>Taux de sel insuffisant</td><td>Mesurer la salinité → ajouter sel si &lt; 4 kg/m³</td></tr>
+                  <tr><td><span class="al-t al-td">A1</span> Prob. cellule</td><td>Cellule entartrée ou usée</td><td>Inspecter → détartrer si besoin. Vérifier connexions. Si persistant → professionnel</td></tr>
+                  <tr><td><span class="al-t al-td">A1</span> Prob. coffret</td><td>Défaut électronique</td><td>Contacter un professionnel pour réparation du coffret</td></tr>
+                  <tr><td><span class="al-t al-td">A2</span> Court-circuit</td><td>Court-circuit cellule</td><td>Mettre hors tension → supprimer le CC → remettre sous tension</td></tr>
+                  <tr><td><span class="al-t al-tw">pH clignotant</span></td><td>pH anormal (&gt;8,2 ou &lt;6,0)</td><td>Corriger manuellement aux buses. Attendre 30 min. Si pH normal = sonde à étalonner (§CA)</td></tr>
+                  <tr><td><span class="al-t al-tw">AL clignotant</span></td><td>Corrections pH infructueuses</td><td>Vérifier bidon. Comparer pH boîtier vs bandelettes → si différents : étalonner sonde</td></tr>
+                </tbody>
+              </table>
+              <div class="al-ab info"><span>ℹ️</span><span>L'alarme A1 est <strong>désactivée par défaut</strong>. Pour l'activer : menu sel → code <span class="al-t al-tc">AL</span> → ON.</span></div>
+            </div>
+          </div>
+          <div class="al-card al-alert">
+            <div class="al-ch"><div class="al-ch-ico">🔧</div><h4>Étalonnage rapide sonde pH boîtier — Code CA</h4><span class="al-ch-n">MAINTENANCE</span></div>
+            <div class="al-cb">
+              <div class="al-ab warn"><span>🧪</span><span>Utiliser les solutions <strong>pH7 et pH10</strong> fournies avec l'AQUALUX — pas celles de l'EZ-9909SP.</span></div>
+              <ul class="al-steps">
+                <li class="al-step"><span class="al-sn">1</span><span>Retirer la sonde du porte-sonde → poser le bouchon</span></li>
+                <li class="al-step"><span class="al-sn">2</span><span>Affichage pH → <strong>3s sur V</strong> → code <span class="al-t al-tc">CA</span> → valider <span class="al-t al-tc">V</span></span></li>
+                <li class="al-step"><span class="al-sn">3</span><span>Sonde dans <strong>pH7</strong> → 1 min → <span class="al-t al-tc">V</span> → attendre <span class="al-t al-tok">Oh</span></span></li>
+                <li class="al-step"><span class="al-sn">4</span><span>Rincer → sonde dans <strong>pH10</strong> → 1 min → <span class="al-t al-tc">V</span> → attendre <span class="al-t al-tok">Oh</span></span></li>
+                <li class="al-step"><span class="al-sn">!</span><span><span class="al-t al-td">Er</span> = sonde hors service → réf. PDEPH</span></li>
+              </ul>
+            </div>
+          </div>
+          <div class="al-card al-setup">
+            <div class="al-ch"><div class="al-ch-ico">⚙️</div><h4>Mémo codes menus — Navigation rapide</h4><span class="al-ch-n">RÉFÉRENCE</span></div>
+            <div class="al-cb">
+              <div class="al-sl">Menu pH (appui 3s sur V depuis affichage pH)</div>
+              <ul class="al-steps">
+                <li class="al-step"><span class="al-t al-tc" style="min-width:2.2rem;text-align:center">MA</span><span>Injection manuelle pompe pH (0 à 9,5 min)</span></li>
+                <li class="al-step"><span class="al-t al-tc" style="min-width:2.2rem;text-align:center">Ad</span><span>Ajustement affichage sonde (±0,5 par rapport à bandelettes)</span></li>
+                <li class="al-step"><span class="al-t al-tc" style="min-width:2.2rem;text-align:center">CA</span><span>Étalonnage sonde (solutions pH7 + pH10)</span></li>
+                <li class="al-step"><span class="al-t al-tc" style="min-width:2.2rem;text-align:center">CP</span><span>Volume bassin (code 01 à 30 selon tableau notice)</span></li>
+                <li class="al-step"><span class="al-t al-tc" style="min-width:2.2rem;text-align:center">Co</span><span>Type correcteur : Acide (pH-) ou Basique (pH+)</span></li>
+                <li class="al-step"><span class="al-t al-tc" style="min-width:2.2rem;text-align:center">SE</span><span>Consigne pH (6,8 à 7,6 — défaut 7,2)</span></li>
+              </ul>
+              <div class="al-sl">Menu Électrolyse (appui 3s sur V depuis affichage sel)</div>
+              <ul class="al-steps">
+                <li class="al-step"><span class="al-t al-tc" style="min-width:2.2rem;text-align:center">In</span><span>Inversion polarité selon dureté eau (Off à 16h)</span></li>
+                <li class="al-step"><span class="al-t al-tc" style="min-width:2.2rem;text-align:center">Co</span><span>Volet roulant automatique (On/Off)</span></li>
+                <li class="al-step"><span class="al-t al-tc" style="min-width:2.2rem;text-align:center">AL</span><span>Alarme A1 production (On/Off — Off par défaut)</span></li>
+              </ul>
+              <div class="al-sl">Fréquence inversion cellule (code In) selon dureté TH</div>
+              <div class="al-pg" style="grid-template-columns:repeat(auto-fit,minmax(95px,1fr))">
+                <div class="al-pc"><div class="al-pl">0–5°f</div><div class="al-pv">OFF</div></div>
+                <div class="al-pc"><div class="al-pl">5–12°f</div><div class="al-pv">16h</div></div>
+                <div class="al-pc"><div class="al-pl">12–20°f</div><div class="al-pv">10h</div></div>
+                <div class="al-pc"><div class="al-pl">20–40°f</div><div class="al-pv">6h</div></div>
+                <div class="al-pc"><div class="al-pl">40–60°f</div><div class="al-pv">4h</div></div>
+                <div class="al-pc"><div class="al-pl">&gt;60°f</div><div class="al-pv">2h</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /al-body -->
+    </div><!-- /fr-aqualux -->
+
+    <!-- ── EZ-9909SP ── -->
+    <div id="fr-etalonnage" class="fr-sec hidden">
+      <div class="ez">
+        <div style="text-align:center;margin-bottom:2rem">
+          <div class="ez-bdg">Fiche Réflexe · Piscine</div>
+          <div class="ez-h1">Étalonnage <span>EZ-9909SP</span></div>
+          <div class="ez-sub">Procédure complète de calibration pH — 3 points</div>
+        </div>
+        <div class="ez-alr"><span>⚠️</span><div><strong>pH uniquement à étalonner.</strong> Les mesures TDS, EC et Salinité sont calibrées en usine et ne nécessitent pas de recalibrage utilisateur.</div></div>
+        <div class="ez-st">01 — Matériel nécessaire</div>
+        <div class="ez-mg">
+          <div class="ez-mi"><span>🧪</span> 3 sachets tampons pH (fournis)</div>
+          <div class="ez-mi"><span>🥛</span> 3 verres propres (250 ml)</div>
+          <div class="ez-mi"><span>💧</span> Eau distillée</div>
+          <div class="ez-mi"><span>🧻</span> Chiffon doux / papier absorbant</div>
+        </div>
+        <div class="ez-st">02 — Préparer les solutions tampon</div>
+        <div class="ez-inf">Dissoudre chaque sachet dans <strong>250 ml d'eau distillée</strong> séparément. Bien mélanger jusqu'à dissolution complète. Respecter l'ordre de calibration ci-dessous.</div>
+        <div class="ez-bg2">
+          <div class="ez-bc p7"><div class="ez-bn">6,86</div><div class="ez-bl">Neutre</div><span class="ez-bo">① En 1er</span></div>
+          <div class="ez-bc p4"><div class="ez-bn">4,00</div><div class="ez-bl">Acide</div><span class="ez-bo">② En 2e</span></div>
+          <div class="ez-bc p9"><div class="ez-bn">9,18</div><div class="ez-bl">Basique</div><span class="ez-bo">③ En 3e</span></div>
+        </div>
+        <div class="ez-st">03 — Procédure pas à pas</div>
+        <div class="ez-sb s1">
+          <div class="ez-sh"><span class="ez-sn">POINT 1</span><span class="ez-st2">Solution pH 6,86 — Neutre</span><span class="ez-sbdg">pH 6,86</span></div>
+          <div class="ez-sbody">
+            <div class="ez-ss"><span class="ez-si">🔌</span><span>Allumer l'appareil et sélectionner le mode <strong>pH</strong></span></div>
+            <div class="ez-ss"><span class="ez-si">⌨️</span><span>Appuyer <strong>longuement</strong> sur <span class="ez-key">MODE/CAL</span> jusqu'à l'apparition de <span class="ez-key">CAL</span> à l'écran</span></div>
+            <div class="ez-ss"><span class="ez-si">🧪</span><span>Plonger la sonde dans le verre <strong>pH 6,86</strong></span></div>
+            <div class="ez-ss"><span class="ez-si">⏳</span><span>Attendre la stabilisation → l'appareil reconnaît automatiquement et affiche <span class="ez-pass">PASS</span></span></div>
+            <div class="ez-ss"><span class="ez-si">💧</span><span>Rincer la sonde à l'eau distillée, sécher doucement</span></div>
+          </div>
+        </div>
+        <div class="ez-sb s2">
+          <div class="ez-sh"><span class="ez-sn">POINT 2</span><span class="ez-st2">Solution pH 4,00 — Acide</span><span class="ez-sbdg">pH 4,00</span></div>
+          <div class="ez-sbody">
+            <div class="ez-ss"><span class="ez-si">🧪</span><span>Plonger la sonde dans le verre <strong>pH 4,00</strong></span></div>
+            <div class="ez-ss"><span class="ez-si">⌨️</span><span>Appuyer <strong>longuement</strong> sur <span class="ez-key">MODE/CAL</span> pour passer au point suivant</span></div>
+            <div class="ez-ss"><span class="ez-si">⏳</span><span>Attendre la stabilisation → affichage <span class="ez-pass">PASS</span></span></div>
+            <div class="ez-ss"><span class="ez-si">💧</span><span>Rincer la sonde à l'eau distillée</span></div>
+          </div>
+        </div>
+        <div class="ez-sb s3">
+          <div class="ez-sh"><span class="ez-sn">POINT 3</span><span class="ez-st2">Solution pH 9,18 — Basique</span><span class="ez-sbdg">pH 9,18</span></div>
+          <div class="ez-sbody">
+            <div class="ez-ss"><span class="ez-si">🧪</span><span>Plonger la sonde dans le verre <strong>pH 9,18</strong></span></div>
+            <div class="ez-ss"><span class="ez-si">⌨️</span><span>Appuyer <strong>longuement</strong> sur <span class="ez-key">MODE/CAL</span></span></div>
+            <div class="ez-ss"><span class="ez-si">⏳</span><span>Attendre la stabilisation → affichage <span class="ez-pass">PASS</span></span></div>
+            <div class="ez-ss"><span class="ez-si">💧</span><span>Rincer la sonde à l'eau distillée</span></div>
+            <div class="ez-ss"><span class="ez-si">🔒</span><span>Remettre le <strong>capuchon protecteur</strong> → étalonnage terminé</span></div>
+          </div>
+        </div>
+        <div class="ez-st" style="margin-top:1.5rem">04 — Quand étalonner ?</div>
+        <table class="ez-pt">
+          <thead><tr><th>Situation</th><th>Action</th></tr></thead>
+          <tbody>
+            <tr><td>🌱 Début de saison</td><td><span class="ez-dot g"></span>Étalonner obligatoirement</td></tr>
+            <tr><td>📅 Utilisation normale</td><td><span class="ez-dot g"></span>Tous les 2 à 3 mois</td></tr>
+            <tr><td>📉 Mesures semblant incohérentes</td><td><span class="ez-dot y"></span>Étalonner immédiatement</td></tr>
+            <tr><td>💥 Après un choc ou une chute</td><td><span class="ez-dot y"></span>Étalonner avant toute mesure</td></tr>
+            <tr><td>🕐 Valeur longue à se stabiliser</td><td><span class="ez-dot y"></span>Rincer la sonde + étalonner</td></tr>
+          </tbody>
+        </table>
+        <div style="text-align:center;margin-top:1.5rem;font-family:monospace;font-size:.68rem;color:#8b949e;letter-spacing:.1em">
+          EZ-9909SP · Calibration pH 3 points · <span style="color:#00d9ff">4,00 / 6,86 / 9,18</span>
+        </div>
+      </div>
+    </div><!-- /fr-etalonnage -->
+
+  </div><!-- /tab-fiches -->
+
+  <!-- TAB TACHES -->
+  <div id="tab-taches" class="bg-white rounded-b-xl shadow p-6 hidden">
+    <div class="flex justify-between items-center mb-2">
+      <div>
+        <h2 class="text-lg font-semibold text-gray-700">Liste de tâches</h2>
+        <p class="text-xs text-gray-400 mt-0.5">Générées depuis les recommandations. Cochez une tâche pour la supprimer.</p>
+      </div>
+      <button onclick="clearAllTasks()" class="text-xs text-red-500 hover:text-red-700 border border-red-300 px-3 py-1 rounded">🗑 Tout effacer</button>
+    </div>
+    <div id="taskList" class="mt-4"></div>
+  </div>
+
+  <!-- TAB ETALONNAGE -->
+  <div id="tab-etalonnage" class="bg-white rounded-b-xl shadow p-6 hidden">
+    <h2 class="text-lg font-semibold text-gray-700 mb-1">Suivi des étalonnages</h2>
+    <p class="text-sm text-gray-400 mb-5">Enregistrez chaque étalonnage de vos appareils pour suivre leur fréquence et anticiper les prochaines échéances.</p>
+
+    <!-- Badges derniers étalonnages -->
+    <div id="etalonBadges" class="flex flex-wrap gap-3 mb-6"></div>
+
+    <!-- Formulaire -->
+    <div class="border border-sky-100 rounded-xl p-4 bg-sky-50 mb-6">
+      <h3 class="text-sm font-semibold text-gray-600 mb-3">Nouvel étalonnage</h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <label class="block text-sm text-gray-600 mb-1">Date</label>
+          <input type="date" id="etalonDate" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400">
+        </div>
+        <div>
+          <label class="block text-sm text-gray-600 mb-1">Appareil / sonde</label>
+          <select id="etalonDevice" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400">
+            <option value="Appareil de mesure (pH / TDS / Cond / Salinité)">Appareil de mesure (pH / TDS / Cond / Salinité)</option>
+            <option value="Sonde catalyseur">Sonde catalyseur</option>
+            <option value="Autre">Autre</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm text-gray-600 mb-1">Appareil personnalisé (si Autre)</label>
+          <input type="text" id="etalonCustom" placeholder="ex : Sonde redox" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400">
+        </div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
+        <div>
+          <label class="block text-sm text-gray-600 mb-1">Réalisé par</label>
+          <input type="text" id="etalonBy" placeholder="ex : moi-même, technicien…" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400">
+        </div>
+        <div>
+          <label class="block text-sm text-gray-600 mb-1">Notes / observations</label>
+          <input type="text" id="etalonNotes" placeholder="ex : solution tampon pH 7 utilisée" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400">
+        </div>
+      </div>
+      <button onclick="saveEtalon()" class="mt-4 bg-sky-600 hover:bg-sky-700 text-white px-5 py-2 rounded-lg font-semibold text-sm transition">💾 Enregistrer</button>
+    </div>
+
+    <!-- Tableau historique -->
+    <div id="etalonTable" class="overflow-x-auto"></div>
+  </div>
+
+  <!-- TAB PARAMETRES -->
+  <div id="tab-parametres" class="bg-white rounded-b-xl shadow p-6 hidden">
+    <h2 class="text-lg font-semibold text-gray-700 mb-4">Dimensions de la piscine</h2>
+
+    <p class="text-xs text-gray-500 mb-2 uppercase tracking-wide font-semibold">Bassin principal</p>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div>
+        <label class="block text-sm text-gray-600 mb-1">Longueur (m)</label>
+        <input type="number" id="paramL" step="0.1" min="0" placeholder="ex: 8" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400">
+      </div>
+      <div>
+        <label class="block text-sm text-gray-600 mb-1">Largeur (m)</label>
+        <input type="number" id="paramW" step="0.1" min="0" placeholder="ex: 4" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400">
+      </div>
+      <div>
+        <label class="block text-sm text-gray-600 mb-1">Profondeur moy. (m)</label>
+        <input type="number" id="paramD" step="0.1" min="0" placeholder="ex: 1.5" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400">
+      </div>
+    </div>
+
+    <p class="text-xs text-gray-500 mt-5 mb-2 uppercase tracking-wide font-semibold">Marche / banquette</p>
+    <p class="text-xs text-gray-400 mb-3">Volume d'eau de la marche immergée (ex : banquette sur toute la largeur).</p>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div>
+        <label class="block text-sm text-gray-600 mb-1">Longueur marche (m)</label>
+        <input type="number" id="paramSL" step="0.1" min="0" placeholder="ex: 4" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400">
+      </div>
+      <div>
+        <label class="block text-sm text-gray-600 mb-1">Largeur marche (m)</label>
+        <input type="number" id="paramSW" step="0.1" min="0" placeholder="ex: 1.2" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400">
+      </div>
+      <div>
+        <label class="block text-sm text-gray-600 mb-1">Profondeur eau marche (m)</label>
+        <input type="number" id="paramSD" step="0.1" min="0" placeholder="ex: 0.4" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400">
+      </div>
+    </div>
+
+    <div class="mt-4 p-3 bg-sky-50 rounded-lg" id="volumeDisplay" style="display:none">
+      <span class="text-sky-700 font-semibold" id="volumeText"></span>
+    </div>
+
+    <h3 class="text-base font-semibold text-gray-700 mt-6 mb-3">Type de piscine</h3>
+    <div class="flex gap-4">
+      <label class="flex items-center gap-2 cursor-pointer">
+        <input type="radio" name="poolType" id="typeChlorine" value="chlorine" class="accent-sky-600"> Chlore classique
+      </label>
+      <label class="flex items-center gap-2 cursor-pointer">
+        <input type="radio" name="poolType" id="typeSalt" value="salt" class="accent-sky-600"> Sel (électrolyse)
+      </label>
+    </div>
+
+    <h3 class="text-base font-semibold text-gray-700 mt-6 mb-3">⏱ Minuterie</h3>
+    <p class="text-xs text-gray-400 mb-3">Durée par défaut utilisée par la minuterie (ex : temps d'attente après un traitement).</p>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div>
+        <label class="block text-sm text-gray-600 mb-1">Heures</label>
+        <input type="number" id="paramTimerH" min="0" max="23" placeholder="0" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400">
+      </div>
+      <div>
+        <label class="block text-sm text-gray-600 mb-1">Minutes</label>
+        <input type="number" id="paramTimerM" min="0" max="59" placeholder="30" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400">
+      </div>
+      <div>
+        <label class="block text-sm text-gray-600 mb-1">Secondes</label>
+        <input type="number" id="paramTimerS" min="0" max="59" placeholder="0" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400">
+      </div>
+      <div>
+        <label class="block text-sm text-gray-600 mb-1">Libellé</label>
+        <input type="text" id="paramTimerLabel" placeholder="ex: Attente pH+" class="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400">
+      </div>
+    </div>
+
+    <button onclick="saveParams()" class="mt-6 bg-sky-600 hover:bg-sky-700 text-white px-6 py-2 rounded-lg font-semibold text-sm transition">💾 Sauvegarder</button>
+    <span id="paramSaved" class="ml-3 text-green-600 text-sm hidden">✓ Enregistré</span>
+  </div>
+</div>
+
+<!-- Timer widget -->
+<div id="timerWidget" class="fixed bottom-5 right-5 bg-white shadow-2xl rounded-2xl p-5 border border-sky-200 z-50 hidden w-56">
+  <div class="flex justify-between items-center mb-2">
+    <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">⏱ Minuterie</span>
+    <button onclick="timerHide()" class="text-gray-300 hover:text-gray-500 text-lg leading-none">✕</button>
+  </div>
+  <div id="timerLabel" class="text-xs text-gray-400 text-center mb-1"></div>
+  <div id="timerDisplay" class="text-4xl font-mono font-bold text-sky-700 text-center tracking-widest mb-3">--:--</div>
+  <div class="flex gap-2 justify-center">
+    <button id="timerStartBtn" onclick="timerToggle()" class="bg-sky-600 hover:bg-sky-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium flex-1">▶ Start</button>
+    <button onclick="timerReset()" class="bg-gray-100 hover:bg-gray-200 text-gray-600 px-3 py-1.5 rounded-lg text-sm font-medium">↺</button>
+  </div>
+</div>
+
+<!-- Footer -->
+<div class="text-center text-xs text-gray-400 mt-6 pb-6 footer-safe">Données stockées localement dans votre navigateur</div>
+
+<!-- Toast notification -->
+<div id="toast" class="hidden"></div>
+
+<script>
+// ─── Cross-browser helpers ─────────────────────────────────────────────────────
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+
+let _toastTimer = null;
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.remove('hidden');
+  if (_toastTimer) clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => el.classList.add('hidden'), 2500);
+}
+
+// ─── Storage helpers ───────────────────────────────────────────────────────────
+const MEASURES_KEY = 'piscine_measures';
+const PARAMS_KEY   = 'piscine_params';
+
+function getMeasures() { return JSON.parse(localStorage.getItem(MEASURES_KEY) || '[]'); }
+function setMeasures(d) { localStorage.setItem(MEASURES_KEY, JSON.stringify(d)); }
+function getParams()   { return JSON.parse(localStorage.getItem(PARAMS_KEY) || '{}'); }
+function setParams(p)  { localStorage.setItem(PARAMS_KEY, JSON.stringify(p)); }
+
+// ─── Tabs ──────────────────────────────────────────────────────────────────────
+function showTab(name) {
+  ['saisie','historique','graphiques','fiches','taches','etalonnage','parametres'].forEach(t => {
+    document.getElementById('tab-' + t).classList.toggle('hidden', t !== name);
+  });
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    b.classList.toggle('active', b.getAttribute('onclick') === `showTab('${name}')`);
+  });
+  if (name === 'historique')  renderHistory();
+  if (name === 'graphiques')  renderCharts();
+  if (name === 'parametres')  loadParams();
+  if (name === 'etalonnage')  renderEtalon();
+  if (name === 'taches')      renderTasks();
+}
+
+function showFiche(name, btn) {
+  document.querySelectorAll('.fr-sec').forEach(s => s.classList.add('hidden'));
+  document.querySelectorAll('.fr-subbtn').forEach(b => b.classList.remove('active'));
+  document.getElementById('fr-' + name).classList.remove('hidden');
+  btn.classList.add('active');
+}
+
+function showAlTab(name, btn) {
+  document.querySelectorAll('.al-pan').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.al-sb').forEach(b => b.classList.remove('active'));
+  document.getElementById('al-' + name).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ─── Init ──────────────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  const now = new Date();
+  now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+  document.getElementById('inputDate').value = now.toISOString().slice(0,16);
+  updatePoolSummary();
+  updateTaskBadge();
+
+  // Live reco on input change
+  ['inputPH','inputTDS','inputCond','inputSalPPM','inputSalPct','inputTemp'].forEach(id => {
+    document.getElementById(id).addEventListener('input', updateLiveReco);
+  });
+});
+
+function calcVolume(p) {
+  const main  = (p.L && p.W && p.D)    ? p.L * p.W * p.D       : 0;
+  const step  = (p.SL && p.SW && p.SD) ? p.SL * p.SW * p.SD    : 0;
+  return { main, step, total: main + step };
+}
+
+function updatePoolSummary() {
+  const p = getParams();
+  const v = calcVolume(p);
+  if (v.total > 0) {
+    const stepInfo = v.step > 0 ? ` + marche ${v.step.toFixed(1)} m³` : '';
+    document.getElementById('poolSummary').textContent =
+      `${p.L||'?'}m × ${p.W||'?'}m × ${p.D||'?'}m — Volume total : ${v.total.toFixed(1)} m³ (${(v.total*1000).toLocaleString('fr-FR')} L)${stepInfo} · ${p.type === 'salt' ? 'Piscine sel' : 'Piscine chlore'}`;
+  }
+}
+
+// ─── Recommendations engine ───────────────────────────────────────────────────
+function analyze(ph, tds, cond, salPPM, salPct, temp, params) {
+  const items = [];
+  const isSalt = params.type === 'salt';
+  const v     = calcVolume(params);
+  const volM3 = v.total > 0 ? v.total : null;
+  const volL  = volM3 ? volM3 * 1000 : null;
+  const surfM2 = params.L && params.W ? params.L * params.W : null;
+
+  function qty(productPer10kL, label) {
+    if (!volL) return label;
+    const g = Math.round((productPer10kL * volL) / 10000);
+    return `${label} — dose : ~${g >= 1000 ? (g/1000).toFixed(2)+' kg' : g+' g'} pour ${volM3.toFixed(1)} m³`;
+  }
+
+  function dilution(pct, label) {
+    if (!volM3) return `${label} (renouveler ~${(pct*100).toFixed(0)}% du volume)`;
+    const m3 = (volM3 * pct).toFixed(2);
+    const cm = surfM2 ? ((volM3 * pct / surfM2) * 100).toFixed(1) : null;
+    return `${label} — vidanger ${m3} m³${cm ? `, soit ~${cm} cm de baisse de niveau` : ''}, puis compléter à l'eau fraîche`;
+  }
+
+  // pH
+  if (ph !== null && !isNaN(ph)) {
+    if (ph < 6.8) {
+      items.push({ level:'bad', param:'pH', value: ph, msg: `pH très bas (${ph}) : l'eau est fortement acide, risque de corrosion des équipements (pompe, liner, électrolyseur) et d'irritation cutanée et oculaire des baigneurs. Le chlore, bien qu'actif, est trop agressif.`, actions: [
+        qty(200, 'Ajouter du pH+ (carbonate de sodium ou bicarbonate de soude) — dissoudre dans un seau d\'eau avant de verser devant les buses de refoulement'),
+        'Faire tourner la filtration pendant 2h minimum pour homogénéiser',
+        'Attendre 4h avant de baigner, revérifier le pH avant la baignade',
+        'Si pH toujours < 6.8 après 24h, renouveler le traitement à demi-dose'
+      ]});
+    } else if (ph < 7.2) {
+      items.push({ level:'warn', param:'pH', value: ph, msg: `pH bas (${ph}) : eau légèrement acide. Le chlore est efficace mais peut irriter les yeux à la longue. Corriger avant que la situation s'aggrave.`, actions: [
+        qty(100, 'Ajouter du pH+ (carbonate de sodium) — diluer dans un seau d\'eau avant d\'épandre'),
+        'Lancer la filtration 1h pour répartir le produit',
+        'Revérifier après 12h — ne pas surdoser si la valeur approche 7.2'
+      ]});
+    } else if (ph <= 7.6) {
+      items.push({ level:'ok', param:'pH', value: ph, msg: `pH parfait (${ph}) — plage idéale 7.2–7.6 ✓. L'eau est confortable pour les baigneurs et le chlore fonctionne à son plein rendement.`, actions: [] });
+    } else if (ph <= 7.8) {
+      items.push({ level:'warn', param:'pH', value: ph, msg: `pH légèrement haut (${ph}) : l'efficacité du chlore commence à baisser (à pH 7.8, environ 30% du chlore est inactif). Risque de trouble de l'eau si non corrigé.`, actions: [
+        qty(80, 'Ajouter du pH- (bisulfate de sodium) — ne jamais mélanger avec d\'autres produits, verser directement dans l\'eau en circulation'),
+        'Filtration en marche pendant 1h minimum',
+        'Revérifier après 12h — éviter de surdoser car le pH peut encore baisser'
+      ]});
+    } else {
+      items.push({ level:'bad', param:'pH', value: ph, msg: `pH très haut (${ph}) : à ce niveau, plus de 80% du chlore est inactif (hypochlorite). L'eau risque de se troubler, des dépôts calcaires peuvent apparaître sur les parois et équipements.`, actions: [
+        qty(150, 'Ajouter du pH- (bisulfate de sodium ou acide chlorhydrique dilué 22%) — verser lentement en face des buses, jamais près de la skimmer'),
+        'Faire tourner la pompe 2h minimum à plein débit',
+        'Ne pas baigner tant que le pH dépasse 7.8',
+        'Revérifier après 24h — si toujours > 7.8, retraiter à demi-dose'
+      ]});
+    }
+  }
+
+  // TDS
+  if (tds !== null && !isNaN(tds)) {
+    if (tds < 500) {
+      items.push({ level:'warn', param:'TDS', value: tds+'ppm', msg: `TDS faible (${tds} ppm) : l'eau est peu chargée en sels dissous. Peut indiquer une eau très fraîche ou un appareil mal étalonné. Surveiller l'évolution.`, actions: [
+        'Vérifier l\'étalonnage de la sonde TDS',
+        'Contrôler la salinité si piscine sel',
+        'Pas d\'action curative immédiate — remesurez dans 48h'
+      ]});
+    } else if (tds <= 1500) {
+      items.push({ level:'ok', param:'TDS', value: tds+'ppm', msg: `TDS correct (${tds} ppm) ✓ — plage idéale < 1 500 ppm. L'eau n'est pas surchargée en sels dissous, les traitements chimiques restent efficaces.`, actions: [] });
+    } else if (tds <= 2500) {
+      items.push({ level:'warn', param:'TDS', value: tds+'ppm', msg: `TDS élevé (${tds} ppm) : accumulation de sels dissous (produits de traitement, minéraux, matières organiques). L'efficacité des traitements peut diminuer progressivement.`, actions: [
+        dilution(0.15, 'Renouvellement partiel recommandé (15% du volume)'),
+        'Réduire les apports de produits solides (galets chlore à dissolution lente)',
+        'Nettoyer le filtre à sable ou remplacer les cartouches filtrantes',
+        'Remesurez après le renouvellement'
+      ]});
+    } else {
+      items.push({ level:'bad', param:'TDS', value: tds+'ppm', msg: `TDS très élevé (${tds} ppm) : eau fortement surchargée. Les produits chimiques sont moins efficaces, l'eau peut paraître terne ou mousseuse. Renouvellement important nécessaire.`, actions: [
+        dilution(0.30, 'Renouvellement nécessaire (30% du volume)'),
+        'Après remplissage, relancer tous les traitements à dose normale',
+        'Nettoyer le filtre avant de relancer la filtration',
+        'Contrôler à nouveau TDS, pH et chlore 24h après renouvellement'
+      ]});
+    }
+  }
+
+  // Conductivity
+  if (cond !== null && !isNaN(cond)) {
+    if (!isSalt) {
+      if (cond < 200) {
+        items.push({ level:'warn', param:'Conductivité', value: cond+'µS/cm', msg: `Conductivité faible (${cond} µS/cm) : eau très peu minéralisée, probablement une eau de pluie ou une dilution importante récente. Peu de sels dissous, ce qui peut être un signe de bonne dilution mais aussi d'eau instable chimiquement.`, actions: [
+          'Vérifier le TDS et la cohérence des mesures',
+          'Contrôler le pH — une eau peu minéralisée a un pouvoir tampon faible (pH instable)',
+          'Surveiller l\'évolution sur les prochaines 48h'
+        ]});
+      } else if (cond <= 800) {
+        items.push({ level:'ok', param:'Conductivité', value: cond+'µS/cm', msg: `Conductivité normale (${cond} µS/cm) ✓ — plage idéale 200–800 µS/cm. L'eau est correctement minéralisée.`, actions: [] });
+      } else if (cond <= 1500) {
+        items.push({ level:'warn', param:'Conductivité', value: cond+'µS/cm', msg: `Conductivité élevée (${cond} µS/cm) : accumulation de sels minéraux et de résidus de traitement. Cohérent avec un TDS en hausse.`, actions: [
+          dilution(0.10, 'Envisager un renouvellement léger (10% du volume)'),
+          'Éviter les traitements en poudre ou granulés, privilégier le liquide',
+          'Surveiller l\'évolution du TDS en parallèle'
+        ]});
+      } else {
+        items.push({ level:'bad', param:'Conductivité', value: cond+'µS/cm', msg: `Conductivité très élevée (${cond} µS/cm) : eau très chargée en ions dissous. Les traitements perdent en efficacité et l'eau peut causer des dépôts sur les parois et équipements.`, actions: [
+          dilution(0.25, 'Renouvellement partiel important (25% du volume)'),
+          'Réduire ou suspendre les apports chimiques solides',
+          'Nettoyer le filtre et les buses de refoulement',
+          'Contrôler TDS et pH après renouvellement'
+        ]});
+      }
+    } else {
+      if (cond < 4000) {
+        items.push({ level:'bad', param:'Conductivité', value: cond+'µS/cm', msg: `Conductivité trop basse pour piscine sel (${cond} µS/cm) : taux de sel largement insuffisant. L'électrolyseur est probablement en alarme ou en arrêt de sécurité — il ne peut pas produire de chlore.`, actions: [
+          qty(300, 'Ajouter du sel marin de qualité piscine (NaCl pur, sans anti-agglomérant) — répartir sur tout le fond'),
+          'Brosser légèrement pour accélérer la dissolution',
+          'Attendre 24–48h avant de relancer l\'électrolyseur',
+          'Ne pas surdoser — vérifier la conductivité avant tout ajout supplémentaire'
+        ]});
+      } else if (cond < 5000) {
+        items.push({ level:'warn', param:'Conductivité', value: cond+'µS/cm', msg: `Conductivité basse pour piscine sel (${cond} µS/cm), idéal 5 000–9 000 µS/cm. L'électrolyseur fonctionne en sous-régime.`, actions: [
+          qty(150, 'Ajouter du sel marin piscine — répartir sur le fond du bassin'),
+          'Laisser dissoudre 12–24h avec filtration en marche',
+          'Revérifier la conductivité avant de compléter'
+        ]});
+      } else if (cond <= 9000) {
+        items.push({ level:'ok', param:'Conductivité', value: cond+'µS/cm', msg: `Conductivité idéale pour piscine sel (${cond} µS/cm) ✓ — l'électrolyseur fonctionne dans ses conditions optimales.`, actions: [] });
+      } else if (cond <= 12000) {
+        items.push({ level:'warn', param:'Conductivité', value: cond+'µS/cm', msg: `Conductivité élevée pour piscine sel (${cond} µS/cm) : excès de sel. L'électrolyseur peut se mettre en alarme sur certains modèles.`, actions: [
+          dilution(0.10, 'Légère dilution recommandée (10% du volume)'),
+          'Ne pas ajouter de sel',
+          'Surveiller si l\'électrolyseur génère des alarmes'
+        ]});
+      } else {
+        items.push({ level:'bad', param:'Conductivité', value: cond+'µS/cm', msg: `Conductivité trop élevée pour piscine sel (${cond} µS/cm) : surconcentration en sel. Risque de corrosion de l'électrolyseur, des échelles métalliques et des accessoires inox.`, actions: [
+          dilution(0.20, 'Dilution nécessaire (20% du volume)'),
+          'Ne pas ajouter de sel',
+          'Contrôler l\'état des pièces métalliques (échelle, panier skimmer)',
+          'Revérifier la conductivité après renouvellement'
+        ]});
+      }
+    }
+  }
+
+  // Salinity
+  if (salPPM !== null && !isNaN(salPPM)) {
+    if (isSalt) {
+      if (salPPM < 2000) {
+        items.push({ level:'bad', param:'Salinité', value: salPPM+'ppm', msg: `Salinité trop basse (${salPPM} ppm) : l'électrolyseur est en arrêt de sécurité — pas assez de sel pour produire du chlore. Risque d'eau non désinfectée.`, actions: [
+          qty(200, 'Ajouter du sel marin piscine (NaCl ≥ 99%, sans iode ni anti-agglomérant) — répartir sur tout le fond du bassin'),
+          'Brosser le fond pour accélérer la dissolution — ne pas mettre de sel dans le skimmer',
+          'Laisser la filtration tourner 24h avant de relancer l\'électrolyseur',
+          'Contrôler salinité ET conductivité avant remise en route',
+          'En attendant, traiter manuellement avec du chlore liquide ou galets'
+        ]});
+      } else if (salPPM < 3000) {
+        items.push({ level:'warn', param:'Salinité', value: salPPM+'ppm', msg: `Salinité basse (${salPPM} ppm), idéal 3 000–5 000 ppm. L'électrolyseur fonctionne mais en deçà de sa plage optimale, rendement réduit.`, actions: [
+          qty(100, 'Ajouter du sel marin piscine — répartir sur le fond, pas dans le skimmer'),
+          'Attendre dissolution complète (12–24h) avec filtration en marche',
+          'Revérifier avant tout complément pour éviter un surdosage'
+        ]});
+      } else if (salPPM <= 5000) {
+        items.push({ level:'ok', param:'Salinité', value: salPPM+'ppm', msg: `Salinité parfaite (${salPPM} ppm) ✓ — plage idéale 3 000–5 000 ppm. L'électrolyseur produit du chlore dans ses conditions optimales.`, actions: [] });
+      } else if (salPPM <= 6000) {
+        items.push({ level:'warn', param:'Salinité', value: salPPM+'ppm', msg: `Salinité légèrement haute (${salPPM} ppm) : au-dessus de l'idéal, surveiller l'évolution. L'électrolyseur fonctionne encore correctement mais peut générer des alarmes selon le modèle.`, actions: [
+          'Ne pas ajouter de sel',
+          dilution(0.08, 'Légère dilution possible si la valeur continue de monter (8% du volume)'),
+          'Surveiller la conductivité en parallèle'
+        ]});
+      } else {
+        items.push({ level:'bad', param:'Salinité', value: salPPM+'ppm', msg: `Salinité trop élevée (${salPPM} ppm) : risque de corrosion des équipements métalliques (électrolyseur, échelles, pompe). L'eau peut être perçue comme salée par les baigneurs.`, actions: [
+          dilution(0.20, 'Dilution nécessaire (20% du volume)'),
+          'Ne pas ajouter de sel',
+          'Inspecter visuellement l\'électrolyseur et les pièces métalliques',
+          'Revérifier salinité et conductivité après renouvellement'
+        ]});
+      }
+    } else {
+      if (salPPM > 1000) {
+        items.push({ level:'warn', param:'Salinité', value: salPPM+'ppm', msg: `Salinité notable (${salPPM} ppm) pour une piscine chlore classique. Peut provenir de produits chlorés salins (hypochlorite de sodium) ou d'une eau source chargée.`, actions: [
+          'Identifier la source : produits chlorés liquides (hypochlorite), eau de source salée ?',
+          'Si utilisation prolongée d\'hypochlorite de sodium, envisager de passer aux galets',
+          'Surveiller l\'évolution du TDS en parallèle'
+        ]});
+      } else {
+        items.push({ level:'ok', param:'Salinité', value: salPPM+'ppm', msg: `Salinité normale (${salPPM} ppm) pour piscine chlore ✓`, actions: [] });
+      }
+    }
+  }
+
+  // Temperature
+  if (temp !== null && !isNaN(temp)) {
+    if (temp < 15) {
+      items.push({ level:'warn', param:'Température', value: temp+'°C', msg: `Eau froide (${temp}°C) : à cette température, l'activité bactérienne est très réduite et le chlore se dégrade lentement. La filtration peut être réduite.`, actions: [
+        'Réduire la durée de filtration quotidienne (4–6h suffisent)',
+        'Diminuer les doses de traitement — le chlore se consomme moins vite',
+        'Mesurer tout de même le pH une fois par semaine',
+        'Si piscine couverte, maintenir une filtration minimale pour éviter la stagnation'
+      ]});
+    } else if (temp <= 24) {
+      items.push({ level:'ok', param:'Température', value: temp+'°C', msg: `Température correcte (${temp}°C) ✓ — traitement standard recommandé.`, actions: [] });
+    } else if (temp <= 28) {
+      items.push({ level:'ok', param:'Température', value: temp+'°C', msg: `Température de confort (${temp}°C) ✓ — plage idéale pour la baignade. Maintenir les traitements habituels et surveiller régulièrement.`, actions: [] });
+    } else if (temp <= 32) {
+      items.push({ level:'warn', param:'Température', value: temp+'°C', msg: `Eau chaude (${temp}°C) : au-dessus de 28°C, le chlore se dégrade jusqu'à 2× plus vite. Le risque de développement d'algues et de bactéries augmente significativement.`, actions: [
+        'Augmenter la durée de filtration (filtrer au moins 12h/jour, idéalement en continu)',
+        'Augmenter la fréquence des mesures : pH et chlore tous les 1–2 jours',
+        'Vérifier la transparence de l\'eau quotidiennement',
+        'Envisager un traitement anti-algues préventif hebdomadaire',
+        'Faire une mesure de chlore résiduel : maintenir entre 1 et 1,5 mg/L'
+      ]});
+    } else {
+      items.push({ level:'bad', param:'Température', value: temp+'°C', msg: `Eau très chaude (${temp}°C) : conditions proches d'un bain chaud — prolifération rapide de bactéries et algues, dégradation accélérée du chlore. Risque sanitaire si non traité.`, actions: [
+        'Faire tourner la filtration en continu (24h/24)',
+        'Effectuer un traitement choc : ' + qty(30, 'chlore choc (hypochlorite ou granulés) — verser le soir, pompe en marche'),
+        'Contrôler le chlore toutes les 24h et le pH toutes les 48h',
+        'Traitement anti-algues curatif si l\'eau commence à verdir',
+        'Envisager un voile d\'ombrage pour limiter la montée en température',
+        'Ne pas baigner si chlore résiduel < 1 mg/L ou eau trouble'
+      ]});
+    }
+  }
+
+  // Overall status
+  const hasBAD = items.some(i => i.level === 'bad');
+  const hasWARN = items.some(i => i.level === 'warn');
+  return { items, overall: hasBAD ? 'bad' : hasWARN ? 'warn' : 'ok' };
+}
+
+let lastRecoResult = null;
+
+function renderReco(result, container) {
+  if (!result.items.length) { container.innerHTML = '<p class="text-gray-400 text-sm">Saisissez au moins une valeur pour obtenir des recommandations.</p>'; return; }
+
+  const overallLabels = { ok:'🟢 Piscine en parfait état', warn:'🟡 Quelques ajustements recommandés', bad:'🔴 Actions requises' };
+  const overallColors = { ok:'bg-green-50 border-green-200', warn:'bg-yellow-50 border-yellow-200', bad:'bg-red-50 border-red-200' };
+
+  let html = `<div class="border rounded-lg p-3 mb-4 ${overallColors[result.overall]}"><strong>${overallLabels[result.overall]}</strong></div>`;
+  html += '<div class="space-y-3">';
+  result.items.forEach(item => {
+    const colors = { ok:'border-green-200 bg-green-50', warn:'border-yellow-200 bg-yellow-50', bad:'border-red-200 bg-red-50' };
+    const icons  = { ok:'✅', warn:'⚠️', bad:'❌' };
+    html += `<div class="border rounded-lg p-3 ${colors[item.level]}">
+      <div class="flex items-center gap-2 mb-1">
+        <span>${icons[item.level]}</span>
+        <strong class="text-sm">${item.param}</strong>
+        <span class="status-badge ${item.level === 'ok' ? 'status-ok' : item.level === 'warn' ? 'status-warn' : 'status-bad'}">${item.value}</span>
+      </div>
+      <p class="text-sm text-gray-700">${item.msg}</p>`;
+    if (item.actions.length) {
+      html += '<ul class="mt-2 space-y-1">';
+      item.actions.forEach(a => { html += `<li class="text-sm text-gray-600 flex gap-1"><span>→</span><span>${a}</span></li>`; });
+      html += '</ul>';
+    }
+    html += '</div>';
+  });
+  html += '</div>';
+
+  if (result.overall !== 'ok') {
+    const nbActions = result.items.filter(i => i.level !== 'ok').reduce((s,i) => s + i.actions.length, 0);
+    html += `<div class="mt-4 pt-4 border-t border-gray-100 flex items-center gap-3">
+      <button onclick="generateTasks()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-lg text-sm font-semibold transition">📋 Générer les tâches (${nbActions})</button>
+      <span class="text-xs text-gray-400">Crée des tâches à cocher dans l'onglet 🗒️ Tâches</span>
+    </div>`;
+  }
+
+  container.innerHTML = html;
+}
+
+function updateLiveReco() {
+  const ph     = parseFloat(document.getElementById('inputPH').value);
+  const tds    = parseFloat(document.getElementById('inputTDS').value);
+  const cond   = parseFloat(document.getElementById('inputCond').value);
+  const salPPM = parseFloat(document.getElementById('inputSalPPM').value);
+  const salPct = parseFloat(document.getElementById('inputSalPct').value);
+  const temp   = parseFloat(document.getElementById('inputTemp').value);
+
+  const hasAny = [ph,tds,cond,salPPM,salPct,temp].some(v => !isNaN(v));
+  const liveDiv = document.getElementById('liveReco');
+  liveDiv.classList.toggle('hidden', !hasAny);
+  if (hasAny) {
+    lastRecoResult = analyze(ph, tds, cond, salPPM, salPct, temp, getParams());
+    renderReco(lastRecoResult, document.getElementById('recoContent'));
+  }
+}
+
+// ─── Save measure ─────────────────────────────────────────────────────────────
+function saveMeasure() {
+  const dateVal = document.getElementById('inputDate').value;
+  if (!dateVal) { alert('Veuillez saisir une date.'); return; }
+
+  const ph     = document.getElementById('inputPH').value;
+  const tds    = document.getElementById('inputTDS').value;
+  const cond   = document.getElementById('inputCond').value;
+  const salPPM = document.getElementById('inputSalPPM').value;
+  const salPct = document.getElementById('inputSalPct').value;
+  const temp   = document.getElementById('inputTemp').value;
+  const notes  = document.getElementById('inputNotes').value;
+
+  if (!ph && !tds && !cond && !salPPM && !salPct && !temp) { alert('Saisissez au moins une valeur.'); return; }
+
+  const measure = {
+    id: Date.now(),
+    date: dateVal,
+    ph: ph ? parseFloat(ph) : null,
+    tds: tds ? parseFloat(tds) : null,
+    cond: cond ? parseFloat(cond) : null,
+    salPPM: salPPM ? parseFloat(salPPM) : null,
+    salPct: salPct ? parseFloat(salPct) : null,
+    temp: temp ? parseFloat(temp) : null,
+    notes
+  };
+
+  const measures = getMeasures();
+  measures.push(measure);
+  measures.sort((a,b) => new Date(a.date) - new Date(b.date));
+  setMeasures(measures);
+
+  // Reset
+  document.getElementById('inputPH').value = '';
+  document.getElementById('inputTDS').value = '';
+  document.getElementById('inputCond').value = '';
+  document.getElementById('inputSalPPM').value = '';
+  document.getElementById('inputSalPct').value = '';
+  document.getElementById('inputTemp').value = '';
+  document.getElementById('inputNotes').value = '';
+  document.getElementById('liveReco').classList.add('hidden');
+
+  const now = new Date();
+  now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+  document.getElementById('inputDate').value = now.toISOString().slice(0,16);
+
+  showToast('✅ Mesure enregistrée !');
+}
+
+// ─── History ──────────────────────────────────────────────────────────────────
+function renderHistory() {
+  const measures = getMeasures().slice().reverse();
+  const container = document.getElementById('historyTable');
+  if (!measures.length) { container.innerHTML = '<p class="text-gray-400 text-sm">Aucune mesure enregistrée.</p>'; return; }
+
+  let html = `<table class="w-full text-xs border-collapse">
+    <thead><tr class="bg-sky-50 text-gray-600">
+      <th class="border px-2 py-1.5 text-left">Date</th>
+      <th class="border px-2 py-1.5">pH</th>
+      <th class="border px-2 py-1.5">TDS (ppm)</th>
+      <th class="border px-2 py-1.5">Cond. (µS/cm)</th>
+      <th class="border px-2 py-1.5">Sal. (ppm)</th>
+      <th class="border px-2 py-1.5">Sal. (%)</th>
+      <th class="border px-2 py-1.5">Temp. (°C)</th>
+      <th class="border px-2 py-1.5 text-left">Notes</th>
+      <th class="border px-2 py-1.5"></th>
+    </tr></thead><tbody>`;
+
+  const p = getParams();
+  const isSalt = p.type === 'salt';
+
+  function cellColor(level) {
+    if (level === 'ok')   return 'text-green-700 font-semibold';
+    if (level === 'warn') return 'text-yellow-600 font-semibold';
+    if (level === 'bad')  return 'text-red-600 font-bold';
+    return '';
+  }
+  function phLevel(v)    { if (v===null) return ''; return v<6.8||v>7.8?'bad':v<7.2||v>7.6?'warn':'ok'; }
+  function tdsLevel(v)   { if (v===null) return ''; return v<500?'warn':v<=1500?'ok':v<=2500?'warn':'bad'; }
+  function condLevel(v)  {
+    if (v===null) return '';
+    if (!isSalt) return v<200?'warn':v<=800?'ok':v<=1500?'warn':'bad';
+    return v<4000?'bad':v<5000?'warn':v<=9000?'ok':v<=12000?'warn':'bad';
+  }
+  function salLevel(v)   {
+    if (v===null) return '';
+    if (!isSalt) return v<=500?'ok':v<=1000?'warn':'bad';
+    return v<2000?'bad':v<3000?'warn':v<=5000?'ok':v<=6000?'warn':'bad';
+  }
+  function tempLevel(v)  { if (v===null) return ''; return v<15?'warn':v<=28?'ok':v<=32?'warn':'bad'; }
+
+  measures.forEach(m => {
+    const d = new Date(m.date);
+    const dateStr = d.toLocaleDateString('fr-FR') + ' ' + d.toLocaleTimeString('fr-FR', {hour:'2-digit',minute:'2-digit'});
+    html += `<tr class="hover:bg-gray-50">
+      <td class="border px-2 py-1.5 whitespace-nowrap">${dateStr}</td>
+      <td class="border px-2 py-1.5 text-center ${cellColor(phLevel(m.ph))}">${m.ph ?? '—'}</td>
+      <td class="border px-2 py-1.5 text-center ${cellColor(tdsLevel(m.tds))}">${m.tds ?? '—'}</td>
+      <td class="border px-2 py-1.5 text-center ${cellColor(condLevel(m.cond))}">${m.cond ?? '—'}</td>
+      <td class="border px-2 py-1.5 text-center ${cellColor(salLevel(m.salPPM))}">${m.salPPM ?? '—'}</td>
+      <td class="border px-2 py-1.5 text-center">${m.salPct ?? '—'}</td>
+      <td class="border px-2 py-1.5 text-center ${cellColor(tempLevel(m.temp))}">${m.temp != null ? m.temp+'°' : '—'}</td>
+      <td class="border px-2 py-1.5 text-gray-500 max-w-xs truncate">${m.notes || ''}</td>
+      <td class="border px-2 py-1.5 text-center">
+        <button onclick="deleteMeasure(${m.id})" class="text-red-400 hover:text-red-600">✕</button>
+      </td>
+    </tr>`;
+  });
+
+  html += '</tbody></table>';
+  container.innerHTML = html;
+}
+
+function deleteMeasure(id) {
+  if (!confirm('Supprimer cette mesure ?')) return;
+  setMeasures(getMeasures().filter(m => m.id !== id));
+  renderHistory();
+}
+
+function clearHistory() {
+  if (!confirm('Effacer tout l\'historique ? Cette action est irréversible.')) return;
+  setMeasures([]);
+  renderHistory();
+}
+
+// ─── Charts ───────────────────────────────────────────────────────────────────
+let charts = {};
+
+function renderCharts() {
+  const measures = getMeasures();
+
+  function buildChart(canvasId, label, color, dataKey, minY, maxY, idealMin, idealMax) {
+    const ctx = document.getElementById(canvasId).getContext('2d');
+    if (charts[canvasId]) charts[canvasId].destroy();
+
+    const data = measures
+      .filter(m => m[dataKey] !== null && m[dataKey] !== undefined)
+      .map(m => ({ x: new Date(m.date), y: m[dataKey] }));
+
+    charts[canvasId] = new Chart(ctx, {
+      type: 'line',
+      data: {
+        datasets: [
+          {
+            label,
+            data,
+            borderColor: color,
+            backgroundColor: color + '22',
+            fill: true,
+            tension: 0.3,
+            pointRadius: 4,
+            pointHoverRadius: 6
+          },
+          ...(idealMin !== undefined ? [{
+            label: 'Zone idéale',
+            data: data.map(d => ({ x: d.x, y: idealMax })),
+            borderColor: '#22c55e44',
+            backgroundColor: '#22c55e11',
+            fill: '+1',
+            borderDash: [4,4],
+            pointRadius: 0,
+            tension: 0
+          }, {
+            label: '',
+            data: data.map(d => ({ x: d.x, y: idealMin })),
+            borderColor: '#22c55e44',
+            backgroundColor: 'transparent',
+            pointRadius: 0,
+            tension: 0
+          }] : [])
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { type: 'time', time: { unit: 'day', displayFormats: { day: 'd MMM' } }, ticks: { font: { size: 10 } } },
+          y: { min: minY, max: maxY, ticks: { font: { size: 10 } } }
+        }
+      }
+    });
+  }
+
+  if (measures.length === 0) {
+    ['chartPH','chartTDS','chartCond','chartSal'].forEach(id => {
+      const ctx = document.getElementById(id).getContext('2d');
+      if (charts[id]) charts[id].destroy();
+      ctx.font = '12px system-ui, sans-serif';
+      ctx.fillStyle = '#9ca3af';
+      ctx.textAlign = 'center';
+      ctx.fillText('Aucune donnée', ctx.canvas.width/2, ctx.canvas.height/2);
+    });
+    return;
+  }
+
+  buildChart('chartPH',   'pH',              '#0ea5e9', 'ph',     5,  9,    7.2, 7.6);
+  buildChart('chartTDS',  'TDS (ppm)',        '#8b5cf6', 'tds',    0,  null);
+  buildChart('chartCond', 'Conductivité µS/cm',  '#f59e0b', 'cond',   0,  null);
+  buildChart('chartSal',  'Salinité ppm',     '#ef4444', 'salPPM', 0,  null);
+  buildChart('chartTemp', 'Température °C',   '#f97316', 'temp',   0,  40,   24,  28);
+}
+
+// ─── Params ───────────────────────────────────────────────────────────────────
+function loadParams() {
+  const p = getParams();
+  if (p.L)  document.getElementById('paramL').value  = p.L;
+  if (p.W)  document.getElementById('paramW').value  = p.W;
+  if (p.D)  document.getElementById('paramD').value  = p.D;
+  if (p.SL) document.getElementById('paramSL').value = p.SL;
+  if (p.SW) document.getElementById('paramSW').value = p.SW;
+  if (p.SD) document.getElementById('paramSD').value = p.SD;
+  if (p.timerH != null) document.getElementById('paramTimerH').value = p.timerH;
+  if (p.timerM != null) document.getElementById('paramTimerM').value = p.timerM;
+  if (p.timerS != null) document.getElementById('paramTimerS').value = p.timerS;
+  if (p.timerLabel)     document.getElementById('paramTimerLabel').value = p.timerLabel;
+  if (p.type === 'salt') document.getElementById('typeSalt').checked = true;
+  else document.getElementById('typeChlorine').checked = true;
+  updateVolumeDisplay();
+  ['paramL','paramW','paramD','paramSL','paramSW','paramSD'].forEach(id => {
+    document.getElementById(id).addEventListener('input', updateVolumeDisplay);
+  });
+}
+
+function updateVolumeDisplay() {
+  const L  = parseFloat(document.getElementById('paramL').value)  || 0;
+  const W  = parseFloat(document.getElementById('paramW').value)  || 0;
+  const D  = parseFloat(document.getElementById('paramD').value)  || 0;
+  const SL = parseFloat(document.getElementById('paramSL').value) || 0;
+  const SW = parseFloat(document.getElementById('paramSW').value) || 0;
+  const SD = parseFloat(document.getElementById('paramSD').value) || 0;
+  const div = document.getElementById('volumeDisplay');
+  const main  = L && W && D    ? L * W * D    : 0;
+  const step  = SL && SW && SD ? SL * SW * SD : 0;
+  const total = main + step;
+  if (total > 0) {
+    let txt = `Volume bassin : ${main.toFixed(1)} m³`;
+    if (step > 0) txt += ` + marche : ${step.toFixed(1)} m³`;
+    txt += ` = <strong>Total : ${total.toFixed(1)} m³ (${(total*1000).toLocaleString('fr-FR')} L)</strong>`;
+    if (L && W) txt += ` — surface plan d'eau : ${(L*W).toFixed(1)} m²`;
+    document.getElementById('volumeText').innerHTML = txt;
+    div.style.display = 'block';
+  } else {
+    div.style.display = 'none';
+  }
+}
+
+function saveParams() {
+  const L  = parseFloat(document.getElementById('paramL').value)  || null;
+  const W  = parseFloat(document.getElementById('paramW').value)  || null;
+  const D  = parseFloat(document.getElementById('paramD').value)  || null;
+  const SL = parseFloat(document.getElementById('paramSL').value) || null;
+  const SW = parseFloat(document.getElementById('paramSW').value) || null;
+  const SD = parseFloat(document.getElementById('paramSD').value) || null;
+  const timerH = parseInt(document.getElementById('paramTimerH').value) || 0;
+  const timerM = parseInt(document.getElementById('paramTimerM').value) || 0;
+  const timerS = parseInt(document.getElementById('paramTimerS').value) || 0;
+  const timerLabel = document.getElementById('paramTimerLabel').value || '';
+  const type = document.querySelector('input[name="poolType"]:checked')?.value || 'chlorine';
+  setParams({ L, W, D, SL, SW, SD, type, timerH, timerM, timerS, timerLabel });
+  updatePoolSummary();
+  timerRemaining = 0; // reset so next open uses new duration
+  showToast('✅ Paramètres enregistrés');
+  const saved = document.getElementById('paramSaved');
+  saved.classList.remove('hidden');
+  setTimeout(() => saved.classList.add('hidden'), 2000);
+}
+
+// ─── Timer ────────────────────────────────────────────────────────────────────
+let timerInterval  = null;
+let timerRemaining = 0;
+
+function timerShow() {
+  const p = getParams();
+  if (timerRemaining === 0) {
+    timerRemaining = ((p.timerH||0)*3600) + ((p.timerM||0)*60) + (p.timerS||0);
+    if (timerRemaining === 0) timerRemaining = 1800; // fallback 30 min
+  }
+  document.getElementById('timerLabel').textContent = p.timerLabel || '';
+  updateTimerDisplay();
+  document.getElementById('timerWidget').classList.remove('hidden');
+}
+
+function timerHide() {
+  document.getElementById('timerWidget').classList.add('hidden');
+}
+
+function timerToggle() {
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+    document.getElementById('timerStartBtn').textContent = '▶ Reprendre';
+    return;
+  }
+  if (timerRemaining <= 0) timerReset();
+  document.getElementById('timerStartBtn').textContent = '⏸ Pause';
+  document.getElementById('timerDisplay').classList.remove('text-red-600');
+  timerInterval = setInterval(() => {
+    timerRemaining--;
+    updateTimerDisplay();
+    if (timerRemaining <= 0) {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      document.getElementById('timerStartBtn').textContent = '▶ Restart';
+      document.getElementById('timerDisplay').classList.add('text-red-600');
+      document.getElementById('timerDisplay').textContent = '00:00';
+      // Bip sonore
+      try {
+        const ctx = new AudioCtx();
+        [0, 0.3, 0.6].forEach(t => {
+          const o = ctx.createOscillator(); const g = ctx.createGain();
+          o.connect(g); g.connect(ctx.destination);
+          o.frequency.value = 880; g.gain.setValueAtTime(0.3, ctx.currentTime+t);
+          g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+t+0.25);
+          o.start(ctx.currentTime+t); o.stop(ctx.currentTime+t+0.25);
+        });
+      } catch(e) {}
+    }
+  }, 1000);
+}
+
+function timerReset() {
+  if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+  const p = getParams();
+  timerRemaining = ((p.timerH||0)*3600) + ((p.timerM||0)*60) + (p.timerS||0);
+  if (timerRemaining === 0) timerRemaining = 1800;
+  document.getElementById('timerStartBtn').textContent = '▶ Start';
+  document.getElementById('timerDisplay').classList.remove('text-red-600');
+  updateTimerDisplay();
+}
+
+function updateTimerDisplay() {
+  const h = Math.floor(timerRemaining / 3600);
+  const m = Math.floor((timerRemaining % 3600) / 60);
+  const s = timerRemaining % 60;
+  const pad = n => String(n).padStart(2,'0');
+  document.getElementById('timerDisplay').textContent =
+    h > 0 ? `${pad(h)}:${pad(m)}:${pad(s)}` : `${pad(m)}:${pad(s)}`;
+}
+
+// ─── Tâches ───────────────────────────────────────────────────────────────────
+const TASKS_KEY = 'piscine_tasks';
+function getTasks() { return JSON.parse(localStorage.getItem(TASKS_KEY) || '[]'); }
+function setTasks(d) { localStorage.setItem(TASKS_KEY, JSON.stringify(d)); }
+
+function generateTasks() {
+  if (!lastRecoResult) return;
+  const existing = getTasks();
+  const existingTexts = new Set(existing.map(t => t.text));
+  const now = new Date().toLocaleDateString('fr-FR');
+  let added = 0;
+  const newTasks = [];
+  lastRecoResult.items.forEach(item => {
+    if (item.level === 'ok') return;
+    item.actions.forEach(action => {
+      if (existingTexts.has(action)) return;
+      newTasks.push({
+        id: Date.now() + Math.floor(Math.random() * 100000),
+        text: action,
+        priority: item.level === 'bad' ? 'obligatoire' : 'facultatif',
+        param: item.param,
+        date: now
+      });
+      existingTexts.add(action);
+      added++;
+    });
+  });
+  if (added === 0) { showToast('Toutes ces tâches sont déjà dans la liste.'); return; }
+  setTasks([...existing, ...newTasks]);
+  updateTaskBadge();
+  // Flash tab badge
+  const badge = document.getElementById('taskBadge');
+  badge.classList.add('animate-bounce');
+  setTimeout(() => badge.classList.remove('animate-bounce'), 1500);
+  showToast(`✅ ${added} tâche(s) ajoutée(s) — voir onglet Tâches`);
+}
+
+function completeTask(id) {
+  const el = document.getElementById('task-' + id);
+  if (!el) return;
+  el.classList.add('completing');
+  setTimeout(() => {
+    setTasks(getTasks().filter(t => t.id !== id));
+    updateTaskBadge();
+    renderTasks();
+  }, 450);
+}
+
+function clearAllTasks() {
+  if (!getTasks().length) return;
+  if (!confirm('Effacer toutes les tâches ?')) return;
+  setTasks([]);
+  updateTaskBadge();
+  renderTasks();
+}
+
+function updateTaskBadge() {
+  const n = getTasks().length;
+  const badge = document.getElementById('taskBadge');
+  if (!badge) return;
+  badge.textContent = n;
+  badge.classList.toggle('hidden', n === 0);
+}
+
+function renderTasks() {
+  const tasks = getTasks();
+  const container = document.getElementById('taskList');
+  if (!tasks.length) {
+    container.innerHTML = '<p class="text-gray-400 text-sm py-4 text-center">Aucune tâche en cours. Générez-en depuis les recommandations.</p>';
+    return;
+  }
+
+  const mandatory = tasks.filter(t => t.priority === 'obligatoire');
+  const optional  = tasks.filter(t => t.priority === 'facultatif');
+
+  function renderGroup(list, label, colorHdr, colorRow, colorBadge) {
+    if (!list.length) return '';
+    let h = `<div class="mb-5">
+      <div class="flex items-center gap-2 mb-2 px-1">
+        <span class="text-xs font-bold uppercase tracking-wide ${colorHdr}">${label}</span>
+        <span class="text-xs text-gray-400">(${list.length} tâche${list.length>1?'s':''})</span>
+      </div>
+      <div class="space-y-2">`;
+    list.forEach(t => {
+      h += `<div id="task-${t.id}" class="task-item flex items-start gap-3 border rounded-xl px-4 py-3 ${colorRow} cursor-pointer group" onclick="completeTask(${t.id})">
+        <div class="mt-0.5 w-5 h-5 flex-shrink-0 rounded-full border-2 ${colorHdr.replace('text','border')} group-hover:bg-current transition flex items-center justify-center">
+          <svg class="w-3 h-3 opacity-0 group-hover:opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex flex-wrap items-center gap-2 mb-1">
+            <span class="status-badge ${colorBadge}">${t.priority}</span>
+            <span class="text-xs text-gray-400 font-medium">${t.param}</span>
+            <span class="text-xs text-gray-300">${t.date}</span>
+          </div>
+          <p class="text-sm text-gray-700 leading-snug">${t.text}</p>
+        </div>
+      </div>`;
+    });
+    h += '</div></div>';
+    return h;
+  }
+
+  container.innerHTML =
+    renderGroup(mandatory, '❗ Obligatoires', 'text-red-600',   'bg-red-50 border-red-200 hover:bg-red-100',     'status-bad') +
+    renderGroup(optional,  '💡 Facultatives', 'text-yellow-600','bg-yellow-50 border-yellow-200 hover:bg-yellow-100','status-warn');
+}
+
+// ─── Étalonnage ───────────────────────────────────────────────────────────────
+const ETALON_KEY = 'piscine_etalon';
+function getEtalons() { return JSON.parse(localStorage.getItem(ETALON_KEY) || '[]'); }
+function setEtalons(d) { localStorage.setItem(ETALON_KEY, JSON.stringify(d)); }
+
+window.addEventListener('DOMContentLoaded', () => {
+  const today = new Date().toISOString().slice(0,10);
+  const dateEl = document.getElementById('etalonDate');
+  if (dateEl) dateEl.value = today;
+});
+
+function saveEtalon() {
+  const date   = document.getElementById('etalonDate').value;
+  const device = document.getElementById('etalonDevice').value;
+  const custom = document.getElementById('etalonCustom').value.trim();
+  const by     = document.getElementById('etalonBy').value.trim();
+  const notes  = document.getElementById('etalonNotes').value.trim();
+  if (!date) { alert('Veuillez saisir une date.'); return; }
+  const label = device === 'Autre' && custom ? custom : device;
+  const list = getEtalons();
+  list.push({ id: Date.now(), date, device: label, by, notes });
+  list.sort((a,b) => new Date(b.date) - new Date(a.date));
+  setEtalons(list);
+  document.getElementById('etalonCustom').value = '';
+  document.getElementById('etalonBy').value = '';
+  document.getElementById('etalonNotes').value = '';
+  renderEtalon();
+  showToast('✅ Étalonnage enregistré');
+}
+
+function deleteEtalon(id) {
+  if (!confirm('Supprimer cet enregistrement ?')) return;
+  setEtalons(getEtalons().filter(e => e.id !== id));
+  renderEtalon();
+}
+
+function renderEtalon() {
+  const list = getEtalons();
+
+  // ── Badges "dernier étalonnage par appareil" ──
+  const lastByDevice = {};
+  list.forEach(e => {
+    if (!lastByDevice[e.device] || new Date(e.date) > new Date(lastByDevice[e.device].date))
+      lastByDevice[e.device] = e;
+  });
+  const today = new Date(); today.setHours(0,0,0,0);
+  let badgesHtml = '';
+  Object.values(lastByDevice).forEach(e => {
+    const d = new Date(e.date); d.setHours(0,0,0,0);
+    const days = Math.round((today - d) / 86400000);
+    const age = days === 0 ? "aujourd'hui" : days === 1 ? 'il y a 1 jour' : `il y a ${days} jours`;
+    const color = days <= 30  ? 'bg-green-50 border-green-200 text-green-800'
+                : days <= 90  ? 'bg-yellow-50 border-yellow-200 text-yellow-800'
+                : 'bg-red-50 border-red-200 text-red-800';
+    const icon  = days <= 30 ? '✅' : days <= 90 ? '⚠️' : '❌';
+    badgesHtml += `<div class="border rounded-xl px-4 py-2 ${color} text-sm">
+      <div class="font-semibold">${icon} ${e.device}</div>
+      <div class="text-xs mt-0.5">Dernier : ${new Date(e.date).toLocaleDateString('fr-FR')} — <em>${age}</em></div>
+    </div>`;
+  });
+  if (!badgesHtml) badgesHtml = '<p class="text-gray-400 text-sm">Aucun étalonnage enregistré.</p>';
+  document.getElementById('etalonBadges').innerHTML = badgesHtml;
+
+  // ── Tableau ──
+  const container = document.getElementById('etalonTable');
+  if (!list.length) { container.innerHTML = ''; return; }
+
+  let html = `<table class="w-full text-xs border-collapse mt-2">
+    <thead><tr class="bg-sky-50 text-gray-600">
+      <th class="border px-3 py-1.5 text-left">Date</th>
+      <th class="border px-3 py-1.5 text-left">Appareil / sonde</th>
+      <th class="border px-3 py-1.5 text-left">Réalisé par</th>
+      <th class="border px-3 py-1.5 text-left">Notes</th>
+      <th class="border px-3 py-1.5 text-center">Ancienneté</th>
+      <th class="border px-3 py-1.5"></th>
+    </tr></thead><tbody>`;
+
+  list.forEach(e => {
+    const d = new Date(e.date); d.setHours(0,0,0,0);
+    const days = Math.round((today - d) / 86400000);
+    const ageStr = days === 0 ? "Aujourd'hui" : days === 1 ? '1 jour' : `${days} j`;
+    const ageColor = days <= 30 ? 'text-green-600 font-semibold'
+                   : days <= 90 ? 'text-yellow-600 font-semibold'
+                   : 'text-red-600 font-bold';
+    html += `<tr class="hover:bg-gray-50">
+      <td class="border px-3 py-1.5 whitespace-nowrap">${new Date(e.date).toLocaleDateString('fr-FR')}</td>
+      <td class="border px-3 py-1.5 font-medium">${e.device}</td>
+      <td class="border px-3 py-1.5 text-gray-500">${e.by || '—'}</td>
+      <td class="border px-3 py-1.5 text-gray-500 max-w-xs truncate">${e.notes || '—'}</td>
+      <td class="border px-3 py-1.5 text-center ${ageColor}">${ageStr}</td>
+      <td class="border px-3 py-1.5 text-center">
+        <button onclick="deleteEtalon(${e.id})" class="text-red-400 hover:text-red-600">✕</button>
+      </td>
+    </tr>`;
+  });
+
+  html += '</tbody></table>';
+  container.innerHTML = html;
+}
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  });
+}
+</script>
+</body>
+</html>
