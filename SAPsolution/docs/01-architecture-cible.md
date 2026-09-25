@@ -59,12 +59,13 @@ pas gérer deux projets en parallèle.
 Recommandation : **A**. Utiliser **C** en attendant, pour démarrer vite.
 Le choix final dépend de votre version (voir les questions ouvertes).
 
+## Décisions prises
+
+- S/4HANA on-premise, sans SAP CRM ni Sales Cloud : suivi avant-vente et projet en tables Z.
+- Vente indirecte : le partenaire achète la prestation, il est client et facturé (voir 03, §2).
+
 ## Questions ouvertes
 
-1. Version exacte (ex. S/4HANA 2022, 2023) ? On-premise, RISE ou Public Cloud ?
-   *En Public Cloud, il n'y a ni SPRO ni tables Z classiques : l'approche change complètement.*
-2. Avez-vous SAP Sales Cloud (C4C) ou SAP CRM ? Si oui, leads, opportunités et activités sont
-   standard.
-3. Le partenaire intégrateur est-il **facturé par vous** (fournisseur) ou **facture-t-il le client
-   final** (vous lui vendez, il est donc client) ?
-4. La fin de votre message a été coupée (« Je veux… ») : quelle est la suite ?
+1. Release exacte : menu *Système > Statut > Détails composant*, valeurs de `S4CORE` et `SAP_BASIS`.
+   Elle détermine ce qui est disponible pour l'application Fiori (RAP).
+2. La fin de votre premier message a été coupée (« Je veux… ») : quelle est la suite ?

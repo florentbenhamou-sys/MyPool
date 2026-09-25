@@ -34,19 +34,33 @@ Le BP garde BUP002 en historique. Vous pouvez le laisser (traçabilité) ou le s
 
 ## 2. Client direct ou via un partenaire [STANDARD + Z]
 
-### 2a. Rattacher le partenaire au client (fonction partenaire) [STANDARD]
+### 2a. Le partenaire est client (il achète la prestation) [STANDARD]
 
-1. Créer le partenaire (intégrateur) comme BP :
-   - s'il **vous achète** (il facture ensuite le client final) : rôles FLCU00/FLCU01 ;
-   - s'il est **votre sous-traitant** (vous le payez) : rôles fournisseur FLVN00/FLVN01.
-2. Créer une fonction partenaire, par exemple `ZI` « Partenaire intégrateur » :
+Le partenaire vous achète la prestation et la revend au client final. Dans SAP :
+
+| | Vente directe | Vente via partenaire |
+|---|---|---|
+| Donneur d'ordre et facturé (commande, facture) | Client final | **Partenaire** |
+| Client final | Donneur d'ordre | Rattaché au partenaire et au projet |
+
+1. Créer le partenaire comme un BP *Organisation* avec les rôles **FLCU00** et **FLCU01**, comme
+   n'importe quel client (voir §1). C'est lui que l'on saisit comme donneur d'ordre dans les
+   commandes des projets indirects.
+2. Créer une fonction partenaire `ZI` « Partenaire intégrateur », de type **KU** (client) :
    SPRO > *Sales and Distribution > Basic Functions > Partner Determination > Set Up Partner
    Determination > Set Up Partner Determination for Customer Master*
-   - Fonction partenaire `ZI`, type de partenaire **KU** (partenaire client) ou **LI** (partenaire
-     fournisseur), selon le cas précédent.
-   - L'ajouter à la procédure de détermination de partenaires du groupe de comptes utilisé.
-3. Côté utilisateur : BP > rôle FLCU01 > zone de vente > onglet **Partenaires** > ajouter la
-   fonction `ZI` avec le numéro du partenaire.
+   - Définir la fonction partenaire `ZI`, type de partenaire `KU`.
+   - L'ajouter, non obligatoire, à la procédure de détermination de partenaires du groupe de
+     comptes du client final.
+3. Côté utilisateur : BP du **client final** > rôle FLCU01 > zone de vente > onglet
+   **Partenaires** > ajouter `ZI` avec le numéro BP du partenaire.
+   - Le partenaire doit avoir le rôle FLCU01 **dans la même zone de vente**, sinon la saisie
+     est refusée.
+
+Conséquence : le client final n'a besoin des rôles FLCU00/FLCU01 que s'il est aussi facturé en
+direct, ou pour porter la fonction `ZI` dans sa zone de vente. Un client final uniquement indirect
+peut rester en BUP002 : le lien avec le partenaire se fait alors seulement par le projet
+(`ZSAP_PROJECT-PARTNER_BP`, §2b).
 
 ### 2b. Indicateur Direct / Indirect [Z]
 
