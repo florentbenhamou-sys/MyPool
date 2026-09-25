@@ -1,0 +1,20 @@
+@EndUserText.label : 'Systèmes du SI d un Business Partner'
+@AbapCatalog.enhancement.category : #NOT_EXTENSIBLE
+@AbapCatalog.tableCategory : #TRANSPARENT
+@AbapCatalog.deliveryClass : #A
+@AbapCatalog.dataMaintenance : #RESTRICTED
+define table zsap_bp_system {
+  key client      : abap.clnt not null;
+  key system_uuid : sysuuid_x16 not null;
+  partner         : bu_partner;
+  system_name     : abap.char(40);
+  vendor          : abap.char(40);
+  product_version : abap.char(40);
+  hosting         : abap.char(20);
+  system_role     : abap.char(60);
+  comment_text    : abap.string(0);
+  created_by      : syuname;
+  created_at      : timestampl;
+  changed_by      : syuname;
+  changed_at      : timestampl;
+}

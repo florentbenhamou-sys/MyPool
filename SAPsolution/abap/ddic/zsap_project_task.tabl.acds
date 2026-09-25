@@ -1,0 +1,28 @@
+@EndUserText.label : 'Tâches projet (cutover, ateliers)'
+@AbapCatalog.enhancement.category : #NOT_EXTENSIBLE
+@AbapCatalog.tableCategory : #TRANSPARENT
+@AbapCatalog.deliveryClass : #A
+@AbapCatalog.dataMaintenance : #RESTRICTED
+define table zsap_project_task {
+  key client        : abap.clnt not null;
+  key task_uuid     : sysuuid_x16 not null;
+  project_uuid      : sysuuid_x16;
+  seq_no            : abap.numc(4);
+  task_type         : abap.char(10);
+  description       : abap.char(80);
+  responsible       : abap.char(40);
+  plan_start_date   : abap.dats;
+  plan_start_time   : abap.tims;
+  plan_end_date     : abap.dats;
+  plan_end_time     : abap.tims;
+  actual_start_date : abap.dats;
+  actual_start_time : abap.tims;
+  actual_end_date   : abap.dats;
+  actual_end_time   : abap.tims;
+  status            : abap.char(1);
+  comment_text      : abap.string(0);
+  created_by        : syuname;
+  created_at        : timestampl;
+  changed_by        : syuname;
+  changed_at        : timestampl;
+}

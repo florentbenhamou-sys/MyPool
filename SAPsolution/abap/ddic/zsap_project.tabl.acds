@@ -1,0 +1,24 @@
+@EndUserText.label : 'Projet client'
+@AbapCatalog.enhancement.category : #NOT_EXTENSIBLE
+@AbapCatalog.tableCategory : #TRANSPARENT
+@AbapCatalog.deliveryClass : #A
+@AbapCatalog.dataMaintenance : #RESTRICTED
+define table zsap_project {
+  key client       : abap.clnt not null;
+  key project_uuid : sysuuid_x16 not null;
+  project_id       : abap.char(20);
+  description      : abap.char(80);
+  partner          : bu_partner;
+  sales_channel    : abap.char(1);
+  partner_bp       : bu_partner;
+  subscr_tier      : abap.char(10);
+  project_type     : abap.char(10);
+  start_date       : abap.dats;
+  golive_date      : abap.dats;
+  status           : abap.char(1);
+  comment_text     : abap.string(0);
+  created_by       : syuname;
+  created_at       : timestampl;
+  changed_by       : syuname;
+  changed_at       : timestampl;
+}

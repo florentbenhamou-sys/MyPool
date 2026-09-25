@@ -1,0 +1,20 @@
+@EndUserText.label : 'Jalons datés d un Business Partner'
+@AbapCatalog.enhancement.category : #NOT_EXTENSIBLE
+@AbapCatalog.tableCategory : #TRANSPARENT
+@AbapCatalog.deliveryClass : #A
+@AbapCatalog.dataMaintenance : #RESTRICTED
+define table zsap_bp_event {
+  key client      : abap.clnt not null;
+  key event_uuid  : sysuuid_x16 not null;
+  partner         : bu_partner;
+  event_type      : abap.char(10);
+  event_date      : abap.dats;
+  event_time      : abap.tims;
+  status          : abap.char(1);
+  contact_partner : bu_partner;
+  comment_text    : abap.string(0);
+  created_by      : syuname;
+  created_at      : timestampl;
+  changed_by      : syuname;
+  changed_at      : timestampl;
+}

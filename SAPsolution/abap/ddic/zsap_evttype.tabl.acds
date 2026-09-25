@@ -1,0 +1,11 @@
+@EndUserText.label : 'Types de jalon avant-vente'
+@AbapCatalog.enhancement.category : #NOT_EXTENSIBLE
+@AbapCatalog.tableCategory : #TRANSPARENT
+@AbapCatalog.deliveryClass : #C
+@AbapCatalog.dataMaintenance : #ALLOWED
+define table zsap_evttype {
+  key client     : abap.clnt not null;
+  key event_type : abap.char(10) not null;
+  description    : abap.char(60);
+  sort_order     : abap.numc(3);
+}

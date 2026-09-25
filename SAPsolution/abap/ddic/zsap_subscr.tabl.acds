@@ -1,0 +1,12 @@
+@EndUserText.label : 'Tranches d abonnement'
+@AbapCatalog.enhancement.category : #NOT_EXTENSIBLE
+@AbapCatalog.tableCategory : #TRANSPARENT
+@AbapCatalog.deliveryClass : #C
+@AbapCatalog.dataMaintenance : #ALLOWED
+define table zsap_subscr {
+  key client      : abap.clnt not null;
+  key subscr_tier : abap.char(10) not null;
+  low_value       : abap.int4;
+  high_value      : abap.int4;
+  description     : abap.char(60);
+}
