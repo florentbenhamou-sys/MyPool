@@ -19,6 +19,17 @@ Prérequis : Node.js ≥ 20. Aucune dépendance cloud : les données sont dans `
 | `npm run db:reset` | **efface** la base et recharge les données de démonstration |
 | `npm run lint` | vérification TypeScript |
 
+## Version fichier HTML (sans installation)
+
+`auto-couts.html` est l'application complète dans un seul fichier : double-cliquez dessus,
+elle s'ouvre dans le navigateur (Edge, Chrome, Firefox), sans Node.js ni droits administrateur.
+
+- Mêmes écrans et même moteur de calcul que la version serveur (le code est partagé).
+- Les données sont enregistrées **dans le navigateur, sur ce poste** (localStorage) : elles restent
+  après fermeture, mais sont effacées si vous videz les données de navigation. Exportez régulièrement
+  en JSON (Paramètres) ; le JSON est compatible entre les deux versions.
+- Regénérer le fichier après une modification du code : `npm run build:html` (sources dans `spa/`).
+
 ## Architecture
 
 - **Next.js 16 (App Router) + React 19 + TypeScript**, rendu serveur des pages, *server actions* pour les écritures.

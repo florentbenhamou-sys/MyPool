@@ -145,7 +145,12 @@ export function BackupCard() {
         </button>
       </div>
       {msg && <p className={`mt-3 text-sm ${msg.ok ? "text-good" : "text-bad"}`}>{msg.text}</p>}
-      <p className="mt-3 text-xs text-muted">Les données sont stockées localement dans <code>prisma/auto-couts.db</code> (SQLite). Le JSON exporté peut être réimporté sur un autre poste. CSV : séparateur « ; », compatible Excel.</p>
+      <p className="mt-3 text-xs text-muted">
+        {process.env.NEXT_PUBLIC_STANDALONE === "1"
+          ? "Version fichier : les données sont enregistrées dans ce navigateur, sur ce poste. Exportez régulièrement en JSON pour les sauvegarder ou les transférer (le nettoyage des données de navigation les efface)."
+          : "Les données sont stockées localement dans prisma/auto-couts.db (SQLite)."}{" "}
+        Le JSON exporté peut être réimporté sur un autre poste ou dans l&apos;autre version de l&apos;application. CSV : séparateur « ; », compatible Excel.
+      </p>
     </Card>
   );
 }
