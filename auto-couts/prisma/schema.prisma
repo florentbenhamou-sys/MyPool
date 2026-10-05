@@ -1,0 +1,161 @@
+// Modèle de données — Auto Coûts
+// SQLite ne supporte pas les enums Prisma : les valeurs autorisées sont
+// définies et validées dans src/lib/domain.ts (zod).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+/// Types d'énergie (carburants, électricité…). Extensible : ajouter une ligne suffit.
+model EnergyType {
+  id        Int      @id @default(autoincrement())
+  code      String   @unique // ex : GASOLINE, DIESEL, ELECTRICITY, LPG, E85, H2
+  label     String
+  unit      String // "L", "kWh", "kg"
+  price     Float // €/unité
+  isElectric Boolean @default(false)
+  sortOrder Int      @default(0)
+  updatedAt DateTime @updatedAt
+}
+
+/// Paramètres globaux (une seule ligne, id = 1)
+model Settings {
+  id                 Int    @id @default(1)
+  /// Taux appliqué à l'avantage en nature (impôt marginal + prélèvements), en %
+  defaultBenefitTaxRate Float @default(41.2)
+  /// Horizon par défaut des projections (années)
+  defaultHorizonYears Int   @default(5)
+  /// "ECONOMIC" (décote + intérêts) ou "CASH" (trésorerie)
+  costMethod          String @default("ECONOMIC")
+  /// Scénario de référence (situation actuelle)
+  referenceScenarioId Int?
+}
+
+model Vehicle {
+  id        Int      @id @default(autoincrement())
+  name      String
+  brand     String   @default("")
+  model     String   @default("")
+  version   String   @default("")
+  year      Int?
+  plate     String   @default("")
+  photoUrl  String   @default("") // URL ou data URL (optionnelle)
+  notes     String   @default("")
+
+  /// COMPANY | NEW | USED
+  category  String
+  /// GASOLINE | DIESEL | HYBRID | PHEV | ELECTRIC | LPG | OTHER
+  powertrain String
+
+  // --- Énergie "carburant" (tout sauf électrique pur)
+  fuelEnergyCode       String? // code EnergyType
+  fuelConsumption      Float? // unité/100 km (constructeur)
+  fuelConsumptionReal  Float? // unité/100 km (réelle, prioritaire si renseignée)
+  fuelPriceOverride    Float? // €/unité, surcharge du prix global
+
+  // --- Énergie électrique (électrique, hybride rechargeable)
+  elecConsumption      Float? // kWh/100 km
+  elecConsumptionReal  Float?
+  elecPriceOverride    Float?
+  /// Hybride rechargeable : part des km parcourus en électrique (%)
+  electricKmShare      Float?
+
+  // --- Kilométrage
+  currentMileage Int?
+  annualKm       Int    @default(0)
+  proKm          Int?   // informatif
+  persoKm        Int?   // informatif
+
+  // --- Voiture de fonction
+  companyMonthlyFee          Float? // redevance mensuelle payée par le salarié
+  employeeExtraContribution  Float? // autre participation mensuelle du salarié
+  employerMonthlyCost        Float? // informatif (non compté dans le coût foyer)
+  benefitInKindMonthly       Float? // avantage en nature mensuel
+  benefitTaxRate             Float? // % surchargeant le taux par défaut
+  taxCostMonthlyOverride     Float? // surcoût fiscal saisi directement (prioritaire)
+  employerEnergySharePct     Float? // % du coût énergie pris en charge par l'employeur
+
+  // --- Achat (neuf / occasion)
+  purchasePrice     Float?
+  mileageAtPurchase Int?
+  downPayment       Float?
+  financedAmount    Float?
+  loanMonths        Int?
+  loanRatePct       Float? // taux annuel nominal %
+  monthlyPayment    Float? // mensualité saisie (prioritaire sur le calcul)
+  residualValue     Float? // valeur de revente estimée en fin de détention
+  holdingYears      Float?
+
+  costLines CostLine[]
+  scenarios ScenarioVehicle[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+/// Ligne de coût personnalisée (assurance, parking, entretien, pneus…)
+model CostLine {
+  id         Int     @id @default(autoincrement())
+  vehicleId  Int
+  vehicle    Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  label      String
+  /// LEASING | INSURANCE | PARKING | OTHER_FIXED | MAINTENANCE | TIRES | REPAIRS | TOLLS | WASHING | OTHER_VARIABLE
+  category   String
+  /// MONTHLY (€/mois) | ANNUAL (€/an) | PER_KM (€/km)
+  frequency  String
+  amount     Float
+  isEstimate Boolean @default(false)
+  sortOrder  Int     @default(0)
+}
+
+/// Configuration automobile du foyer
+model Scenario {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String   @default("")
+  color       String   @default("#2563eb")
+  // Configuration familiale (informative en V1, prévue pour des contraintes futures)
+  adults      Int      @default(2)
+  children    Int      @default(0)
+  needsTwoCarsSimultaneously Boolean @default(false)
+  vehicles    ScenarioVehicle[]
+  priceOverrides ScenarioPriceOverride[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ScenarioVehicle {
+  id         Int      @id @default(autoincrement())
+  scenarioId Int
+  scenario   Scenario @relation(fields: [scenarioId], references: [id], onDelete: Cascade)
+  vehicleId  Int
+  vehicle    Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  /// Kilométrage annuel spécifique à ce scénario (sinon celui du véhicule)
+  annualKmOverride Int?
+  sortOrder  Int      @default(0)
+
+  @@unique([scenarioId, vehicleId])
+}
+
+/// Prix d'énergie spécifique à un scénario (ex : recharge à domicile 0,15 €/kWh)
+model ScenarioPriceOverride {
+  id         Int      @id @default(autoincrement())
+  scenarioId Int
+  scenario   Scenario @relation(fields: [scenarioId], references: [id], onDelete: Cascade)
+  energyCode String
+  price      Float
+
+  @@unique([scenarioId, energyCode])
+}
+
+/// Hypothèses de simulation "Et si…" enregistrées (JSON sérialisé)
+model Simulation {
+  id        Int      @id @default(autoincrement())
+  name      String
+  params    String // JSON des ajustements (voir src/lib/calc/types.ts)
+  createdAt DateTime @default(now())
+}
