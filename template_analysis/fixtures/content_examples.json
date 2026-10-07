@@ -1,0 +1,82 @@
+{
+  "sheets": [
+    {
+      "category": "Tactique",
+      "moment": "Corps de séance",
+      "title": "Conserver pour progresser",
+      "space": [
+        "**Surface** : ",
+        "40x30",
+        "2 zones de 20x30"
+      ],
+      "teams": {
+        "red": 6,
+        "blue": 6,
+        "yellow": "1 joker"
+      },
+      "duration": [
+        "Le temps total 20 minutes",
+        "4 séquences de 4 minutes"
+      ],
+      "goal": [
+        "Rouges : 8 passes = 1 pt",
+        "Bleus : récupérer et marquer dans un mini-but = 2 pts"
+      ],
+      "rules": [
+        "6 contre 6 + 1 joker offensif",
+        "Le joker joue avec l’équipe en possession",
+        "Changement de zone obligatoire après 4 passes",
+        "3 touches maximum",
+        "Hors-jeu non signalé"
+      ],
+      "variables": {
+        "Complexifiantes": [
+          "2 touches maximum",
+          "Supprimer le joker"
+        ],
+        "Simplifiantes": [
+          "Ajouter un 2e joker",
+          "Touches illimitées"
+        ]
+      },
+      "behaviours": [
+        "Orienter son contrôle vers l’espace libre.",
+        "Communiquer avant la passe.",
+        "Enchaîner rapidement après la récupération."
+      ],
+      "diagram": "diagram_conservation.png",
+      "diagram_alt": "Terrain 40x30 en deux zones, 6 rouges contre 6 bleus et un joker jaune",
+      "notes": "Insister sur la prise d'information avant réception."
+    },
+    {
+      "category": "Physique",
+      "moment": "Retour au calme",
+      "title": "Circuit coordination et vitesse de réaction avec ballon au pied en fin de séance",
+      "space": [
+        "**Surface** : ",
+        "20x20"
+      ],
+      "teams": {
+        "blue": 8
+      },
+      "duration": "Le temps total 10 minutes",
+      "goal": [
+        "Améliorer la coordination"
+      ],
+      "rules": [
+        "Départ au signal sonore de l'éducateur, le joueur sort du cône central en conduite de balle",
+        "Slalom entre six piquets espacés d'un mètre puis frappe dans le petit but",
+        "Retour en trottinant par l'extérieur du circuit et passage de relais au partenaire suivant",
+        "Chaque joueur effectue cinq passages minimum avec un temps de récupération complet",
+        "Varier le pied d'appui et la surface de contact à chaque passage",
+        "Le joueur le plus rapide sur cinq passages marque un point pour son équipe",
+        "En cas de perte de balle, reprendre le slalom depuis le premier piquet",
+        "Les éducateurs chronomètrent chaque passage et annoncent les temps à voix haute",
+        "Un joueur blessé ou fatigué peut être remplacé à tout moment par un partenaire",
+        "Alterner sens horaire et anti-horaire toutes les deux minutes pour équilibrer"
+      ],
+      "variables": {},
+      "behaviours": []
+    }
+  ]
+}

@@ -1,0 +1,3318 @@
+{
+ "file": "TemplateSeance.pptx",
+ "slide_number": 1,
+ "slide_size": {
+  "w_in": 13.333,
+  "h_in": 7.5,
+  "w_emu": 12192000,
+  "h_emu": 6858000
+ },
+ "layout": "../slideLayouts/slideLayout1.xml",
+ "theme": {
+  "colors": {
+   "dk1": "#000000",
+   "lt1": "#FFFFFF",
+   "dk2": "#44546A",
+   "lt2": "#E7E6E6",
+   "accent1": "#4472C4",
+   "accent2": "#ED7D31",
+   "accent3": "#A5A5A5",
+   "accent4": "#FFC000",
+   "accent5": "#5B9BD5",
+   "accent6": "#70AD47",
+   "hlink": "#0563C1",
+   "folHlink": "#954F72"
+  },
+  "major_font": "Calibri Light",
+  "minor_font": "Calibri",
+  "clr_map": {
+   "bg1": "lt1",
+   "tx1": "dk1",
+   "bg2": "lt2",
+   "tx2": "dk2",
+   "accent1": "accent1",
+   "accent2": "accent2",
+   "accent3": "accent3",
+   "accent4": "accent4",
+   "accent5": "accent5",
+   "accent6": "accent6",
+   "hlink": "hlink",
+   "folHlink": "folHlink"
+  }
+ },
+ "background": "inherited from layout/master",
+ "shapes": [
+  {
+   "id": "15",
+   "name": "CadreVariable",
+   "kind": "sp",
+   "bbox_in": {
+    "x": 1.633,
+    "y": 5.831,
+    "w": 4.902,
+    "h": 1.531,
+    "right": 6.535,
+    "bottom": 7.362
+   },
+   "bbox_emu": [
+    1492949,
+    5331700,
+    4482296,
+    1399833
+   ],
+   "geometry": "rect",
+   "fill": {
+    "type": "solid",
+    "color": {
+     "hex": "#D9D9D9",
+     "theme_ref": "bg1",
+     "modifiers": [
+      {
+       "lumMod": 0.85
+      }
+     ]
+    }
+   },
+   "line": {
+    "type": "none"
+   },
+   "style_refs": {
+    "lnRef": {
+     "idx": "2",
+     "color": {
+      "hex": "#0A111D",
+      "theme_ref": "accent1",
+      "modifiers": [
+       {
+        "shade": 0.15
+       }
+      ]
+     }
+    },
+    "fillRef": {
+     "idx": "1",
+     "color": {
+      "hex": "#4472C4",
+      "theme_ref": "accent1"
+     }
+    },
+    "effectRef": {
+     "idx": "0",
+     "color": {
+      "hex": "#4472C4",
+      "theme_ref": "accent1"
+     }
+    },
+    "fontRef": {
+     "idx": "minor",
+     "color": {
+      "hex": "#FFFFFF",
+      "theme_ref": "lt1"
+     }
+    }
+   },
+   "text_empty": true,
+   "default_text_props": {
+    "size_pt": 18.0,
+    "bold": false,
+    "italic": false,
+    "font": "Roboto",
+    "color": {
+     "hex": "#FFFFFF",
+     "theme_ref": "preset:white"
+    }
+   }
+  },
+  {
+   "id": "20",
+   "name": "ObjectifExercice",
+   "kind": "sp",
+   "bbox_in": {
+    "x": 2.755,
+    "y": 0.134,
+    "w": 5.332,
+    "h": 0.353,
+    "right": 8.087,
+    "bottom": 0.487
+   },
+   "bbox_emu": [
+    2519035,
+    122505,
+    4875398,
+    323165
+   ],
+   "geometry": "rect",
+   "is_textbox": true,
+   "fill": {
+    "type": "solid",
+    "color": {
+     "hex": "#000000",
+     "theme_ref": "tx1"
+    }
+   },
+   "effects": [
+    {
+     "type": "outerShdw",
+     "blurRad_pt": 4.0,
+     "dist_pt": 3.0,
+     "dir_deg": 90.0,
+     "color": {
+      "hex": "#000000",
+      "theme_ref": "preset:black",
+      "modifiers": [
+       {
+        "alpha": 0.4
+       }
+      ],
+      "alpha": 0.4
+     }
+    }
+   ],
+   "text": {
+    "anchor": "ctr",
+    "wrap": "square",
+    "insets_in": {
+     "lIns": 0.1,
+     "tIns": 0.05,
+     "rIns": 0.1,
+     "bIns": 0.05
+    },
+    "autofit": "spAutoFit",
+    "paragraphs": [
+     {
+      "text": "CRÉER ET UTILISER LES ESPACES",
+      "align": "ctr",
+      "marL_in": 0.0,
+      "indent_in": 0.0,
+      "level": 0,
+      "bullet": null,
+      "lnSpc": {
+       "pct": 100.0
+      },
+      "spcBef": {
+       "pt": 15.0
+      },
+      "spcAft": {
+       "pt": 15.0
+      },
+      "runs": [
+       {
+        "text": "CRÉER ET UTILISER LES ESPACES",
+        "size_pt": 15.0,
+        "bold": true,
+        "italic": false,
+        "font": "Roboto",
+        "color": {
+         "hex": "#FFFFFF",
+         "theme_ref": "preset:white"
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "2",
+   "name": "Coin Educateur",
+   "kind": "sp",
+   "bbox_in": {
+    "x": 0.131,
+    "y": 5.02,
+    "w": 13.034,
+    "h": 0.353,
+    "right": 13.164,
+    "bottom": 5.373
+   },
+   "bbox_emu": [
+    119386,
+    4590052,
+    11918125,
+    323165
+   ],
+   "geometry": "rect",
+   "is_textbox": true,
+   "fill": {
+    "type": "solid",
+    "color": {
+     "hex": "#BF9000",
+     "theme_ref": "accent4",
+     "modifiers": [
+      {
+       "lumMod": 0.75
+      }
+     ]
+    }
+   },
+   "effects": [
+    {
+     "type": "outerShdw",
+     "blurRad_pt": 4.0,
+     "dist_pt": 3.0,
+     "dir_deg": 90.0,
+     "color": {
+      "hex": "#000000",
+      "theme_ref": "preset:black",
+      "modifiers": [
+       {
+        "alpha": 0.4
+       }
+      ],
+      "alpha": 0.4
+     }
+    }
+   ],
+   "text": {
+    "anchor": "ctr",
+    "wrap": "square",
+    "insets_in": {
+     "lIns": 0.1,
+     "tIns": 0.05,
+     "rIns": 0.1,
+     "bIns": 0.05
+    },
+    "autofit": "spAutoFit",
+    "paragraphs": [
+     {
+      "text": "LE COIN DE L’ÉDUCATEUR",
+      "align": "ctr",
+      "marL_in": 0.0,
+      "indent_in": 0.0,
+      "level": 0,
+      "bullet": null,
+      "lnSpc": {
+       "pct": 100.0
+      },
+      "spcBef": {
+       "pt": 15.0
+      },
+      "spcAft": {
+       "pt": 15.0
+      },
+      "runs": [
+       {
+        "text": "LE COIN DE L’ÉDUCATEUR",
+        "size_pt": 15.0,
+        "bold": true,
+        "italic": false,
+        "font": "Roboto",
+        "color": {
+         "hex": "#FFFFFF",
+         "theme_ref": "preset:white"
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "3",
+   "name": "Titre_Espace",
+   "kind": "sp",
+   "bbox_in": {
+    "x": 0.113,
+    "y": 0.575,
+    "w": 2.548,
+    "h": 0.353,
+    "right": 2.661,
+    "bottom": 0.928
+   },
+   "bbox_emu": [
+    103546,
+    525418,
+    2329685,
+    323165
+   ],
+   "geometry": "rect",
+   "is_textbox": true,
+   "fill": {
+    "type": "solid",
+    "color": {
+     "hex": "#44546A"
+    }
+   },
+   "effects": [
+    {
+     "type": "outerShdw",
+     "blurRad_pt": 4.0,
+     "dist_pt": 3.0,
+     "dir_deg": 90.0,
+     "color": {
+      "hex": "#000000",
+      "theme_ref": "preset:black",
+      "modifiers": [
+       {
+        "alpha": 0.4
+       }
+      ],
+      "alpha": 0.4
+     }
+    }
+   ],
+   "text": {
+    "anchor": "ctr",
+    "wrap": "square",
+    "insets_in": {
+     "lIns": 0.1,
+     "tIns": 0.05,
+     "rIns": 0.1,
+     "bIns": 0.05
+    },
+    "autofit": "spAutoFit",
+    "paragraphs": [
+     {
+      "text": "ESPACE",
+      "align": "ctr",
+      "marL_in": 0.0,
+      "indent_in": 0.0,
+      "level": 0,
+      "bullet": null,
+      "lnSpc": {
+       "pct": 100.0
+      },
+      "spcBef": {
+       "pt": 15.0
+      },
+      "spcAft": {
+       "pt": 15.0
+      },
+      "runs": [
+       {
+        "text": "ESPACE",
+        "size_pt": 15.0,
+        "bold": true,
+        "italic": false,
+        "font": "Roboto",
+        "color": {
+         "hex": "#FFFFFF",
+         "theme_ref": "preset:white"
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "16",
+   "name": "Titre_Effectif",
+   "kind": "sp",
+   "bbox_in": {
+    "x": 0.083,
+    "y": 1.793,
+    "w": 2.578,
+    "h": 0.353,
+    "right": 2.661,
+    "bottom": 2.147
+   },
+   "bbox_emu": [
+    75528,
+    1639968,
+    2357704,
+    323165
+   ],
+   "geometry": "rect",
+   "is_textbox": true,
+   "fill": {
+    "type": "solid",
+    "color": {
+     "hex": "#44546A"
+    }
+   },
+   "effects": [
+    {
+     "type": "outerShdw",
+     "blurRad_pt": 4.0,
+     "dist_pt": 3.0,
+     "dir_deg": 90.0,
+     "color": {
+      "hex": "#000000",
+      "theme_ref": "preset:black",
+      "modifiers": [
+       {
+        "alpha": 0.4
+       }
+      ],
+      "alpha": 0.4
+     }
+    }
+   ],
+   "text": {
+    "anchor": "ctr",
+    "wrap": "square",
+    "insets_in": {
+     "lIns": 0.1,
+     "tIns": 0.05,
+     "rIns": 0.1,
+     "bIns": 0.05
+    },
+    "autofit": "spAutoFit",
+    "paragraphs": [
+     {
+      "text": "EFFECTIF",
+      "align": "ctr",
+      "marL_in": 0.0,
+      "indent_in": 0.0,
+      "level": 0,
+      "bullet": null,
+      "lnSpc": {
+       "pct": 100.0
+      },
+      "spcBef": {
+       "pt": 15.0
+      },
+      "spcAft": {
+       "pt": 15.0
+      },
+      "runs": [
+       {
+        "text": "EFFECTIF",
+        "size_pt": 15.0,
+        "bold": true,
+        "italic": false,
+        "font": "Roboto",
+        "color": {
+         "hex": "#FFFFFF",
+         "theme_ref": "preset:white"
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "22",
+   "name": "Text_espace",
+   "kind": "sp",
+   "bbox_in": {
+    "x": 0.074,
+    "y": 0.989,
+    "w": 2.541,
+    "h": 0.707,
+    "right": 2.615,
+    "bottom": 1.696
+   },
+   "bbox_emu": [
+    67682,
+    904435,
+    2323355,
+    646331
+   ],
+   "geometry": "rect",
+   "text": {
+    "anchor": "t",
+    "wrap": "square",
+    "insets_in": {
+     "lIns": 0.1,
+     "tIns": 0.05,
+     "rIns": 0.1,
+     "bIns": 0.05
+    },
+    "autofit": "spAutoFit",
+    "paragraphs": [
+     {
+      "text": "Surface : ",
+      "align": "l",
+      "marL_in": 0.0,
+      "indent_in": 0.0,
+      "level": 0,
+      "bullet": null,
+      "lnSpc": {
+       "pct": 100.0
+      },
+      "spcBef": {
+       "pt": 0.0
+      },
+      "spcAft": {
+       "pt": 0.0
+      },
+      "runs": [
+       {
+        "text": "Surface",
+        "size_pt": 12.0,
+        "bold": true,
+        "italic": false,
+        "font": "Roboto",
+        "color": {
+         "hex": "#000000",
+         "theme_ref": "preset:black"
+        }
+       },
+       {
+        "text": " : ",
+        "size_pt": 12.0,
+        "bold": false,
+        "italic": false,
+        "font": "Roboto",
+        "color": {
+         "hex": "#000000",
+         "theme_ref": "preset:black"
+        }
+       }
+      ]
+     },
+     {
+      "text": "12x12",
+      "align": "l",
+      "marL_in": 0.0,
+      "indent_in": 0.0,
+      "level": 0,
+      "bullet": null,
+      "lnSpc": {
+       "pct": 100.0
+      },
+      "spcBef": {
+       "pt": 0.0
+      },
+      "spcAft": {
+       "pt": 0.0
+      },
+      "runs": [
+       {
+        "text": "12x12",
+        "size_pt": 12.0,
+        "bold": false,
+        "italic": false,
+        "font": "Roboto",
+        "color": {
+         "hex": "#000000",
+         "theme_ref": "preset:black"
+        }
+       }
+      ]
+     },
+     {
+      "text": "3 carrés",
+      "align": "l",
+      "marL_in": 0.0,
+      "indent_in": 0.0,
+      "level": 0,
+      "bullet": null,
+      "lnSpc": {
+       "pct": 100.0
+      },
+      "spcBef": {
+       "pt": 0.0
+      },
+      "spcAft": {
+       "pt": 0.0
+      },
+      "runs": [
+       {
+        "text": "3 carrés",
+        "size_pt": 12.0,
+        "bold": false,
+        "italic": false,
+        "font": "Roboto",
+        "color": {
+         "hex": "#000000",
+         "theme_ref": "preset:black"
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "25",
+   "name": "Titre_TempsDeJeu",
+   "kind": "sp",
+   "bbox_in": {
+    "x": 0.098,
+    "y": 3.126,
+    "w": 2.563,
+    "h": 0.353,
+    "right": 2.661,
+    "bottom": 3.48
+   },
+   "bbox_emu": [
+    89288,
+    2858543,
+    2343943,
+    323165
+   ],
+   "geometry": "rect",
+   "is_textbox": true,
+   "fill": {
+    "type": "solid",
+    "color": {
+     "hex": "#44546A"
+    }
+   },
+   "effects": [
+    {
+     "type": "outerShdw",
+     "blurRad_pt": 4.0,
+     "dist_pt": 3.0,
+     "dir_deg": 90.0,
+     "color": {
+      "hex": "#000000",
+      "theme_ref": "preset:black",
+      "modifiers": [
+       {
+        "alpha": 0.4
+       }
+      ],
+      "alpha": 0.4
+     }
+    }
+   ],
+   "text": {
+    "anchor": "ctr",
+    "wrap": "square",
+    "insets_in": {
+     "lIns": 0.1,
+     "tIns": 0.05,
+     "rIns": 0.1,
+     "bIns": 0.05
+    },
+    "autofit": "spAutoFit",
+    "paragraphs": [
+     {
+      "text": "TEMPS DE JEU",
+      "align": "ctr",
+      "marL_in": 0.0,
+      "indent_in": 0.0,
+      "level": 0,
+      "bullet": null,
+      "lnSpc": {
+       "pct": 100.0
+      },
+      "spcBef": {
+       "pt": 15.0
+      },
+      "spcAft": {
+       "pt": 15.0
+      },
+      "runs": [
+       {
+        "text": "TEMPS DE JEU",
+        "size_pt": 15.0,
+        "bold": true,
+        "italic": false,
+        "font": "Roboto",
+        "color": {
+         "hex": "#FFFFFF",
+         "theme_ref": "preset:white"
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "27",
+   "name": "Horloge",
+   "kind": "pic",
+   "bbox_in": {
+    "x": 0.123,
+    "y": 3.628,
+    "w": 0.406,
+    "h": 0.467,
+    "right": 0.529,
+    "bottom": 4.095
+   },
+   "bbox_emu": [
+    112078,
+    3317012,
+    371475,
+    427037
+   ],
+   "geometry": "rect",
+   "fill": {
+    "type": "none"
+   },
+   "line": {
+    "type": "none"
+   },
+   "image": {
+    "target": "../media/image1.png"
+   }
+  },
+  {
+   "id": "28",
+   "name": "Text_TempsDeJeu",
+   "kind": "sp",
+   "bbox_in": {
+    "x": 0.564,
+    "y": 3.598,
+    "w": 2.196,
+    "h": 0.505,
+    "right": 2.76,
+    "bottom": 4.102
+   },
+   "bbox_emu": [
+    515525,
+    3289574,
+    2008390,
+    461665
+   ],
+   "geometry": "rect",
+   "text": {
+    "anchor": "t",
+    "wrap": "square",
+    "insets_in": {
+     "lIns": 0.1,
+     "tIns": 0.05,
+     "rIns": 0.1,
+     "bIns": 0.05
+    },
+    "autofit": "spAutoFit",
+    "paragraphs": [
+     {
+      "text": "Le temps total 15 minutes",
+      "align": "l",
+      "marL_in": 0.0,
+      "indent_in": 0.0,
+      "level": 0,
+      "bullet": null,
+      "lnSpc": {
+       "pct": 100.0
+      },
+      "spcBef": {
+       "pt": 0.0
+      },
+      "spcAft": {
+       "pt": 0.0
+      },
+      "runs": [
+       {
+        "text": "Le temps total 15 minutes",
+        "size_pt": 12.0,
+        "bold": false,
+        "italic": false,
+        "font": "Roboto",
+        "color": {
+         "hex": "#000000",
+         "theme_ref": "preset:black"
+        }
+       }
+      ]
+     },
+     {
+      "text": "6 séquences de 2 minutes",
+      "align": "l",
+      "marL_in": 0.0,
+      "indent_in": 0.0,
+      "level": 0,
+      "bullet": null,
+      "lnSpc": {
+       "pct": 100.0
+      },
+      "spcBef": {
+       "pt": 0.0
+      },
+      "spcAft": {
+       "pt": 0.0
+      },
+      "runs": [
+       {
+        "text": "6 séquences de 2 minutes",
+        "size_pt": 12.0,
+        "bold": false,
+        "italic": false,
+        "font": "Roboto",
+        "color": {
+         "hex": "#000000",
+         "theme_ref": "preset:black"
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "29",
+   "name": "Titre_REgle",
+   "kind": "sp",
+   "bbox_in": {
+    "x": 2.747,
+    "y": 1.793,
+    "w": 5.344,
+    "h": 0.353,
+    "right": 8.091,
+    "bottom": 2.147
+   },
+   "bbox_emu": [
+    2511975,
+    1639968,
+    4886255,
+    323165
+   ],
+   "geometry": "rect",
+   "is_textbox": true,
+   "fill": {
+    "type": "solid",
+    "color": {
+     "hex": "#44546A"
+    }
+   },
+   "effects": [
+    {
+     "type": "outerShdw",
+     "blurRad_pt": 4.0,
+     "dist_pt": 3.0,
+     "dir_deg": 90.0,
+     "color": {
+      "hex": "#000000",
+      "theme_ref": "preset:black",
+      "modifiers": [
+       {
+        "alpha": 0.4
+       }
+      ],
+      "alpha": 0.4
+     }
+    }
+   ],
+   "text": {
+    "anchor": "ctr",
+    "wrap": "square",
+    "insets_in": {
+     "lIns": 0.1,
+     "tIns": 0.05,
+     "rIns": 0.1,
+     "bIns": 0.05
+    },
+    "autofit": "spAutoFit",
+    "paragraphs": [
+     {
+      "text": "REGLES",
+      "align": "ctr",
+      "marL_in": 0.0,
+      "indent_in": 0.0,
+      "level": 0,
+      "bullet": null,
+      "lnSpc": {
+       "pct": 100.0
+      },
+      "spcBef": {
+       "pt": 15.0
+      },
+      "spcAft": {
+       "pt": 15.0
+      },
+      "runs": [
+       {
+        "text": "REGLES",
+        "size_pt": 15.0,
+        "bold": true,
+        "italic": false,
+        "font": "Roboto",
+        "color": {
+         "hex": "#FFFFFF",
+         "theme_ref": "preset:white"
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "32",
+   "name": "Text_Regle",
+   "kind": "sp",
+   "bbox_in": {
+    "x": 2.838,
+    "y": 2.235,
+    "w": 5.021,
+    "h": 2.121,
+    "right": 7.859,
+    "bottom": 4.356
+   },
+   "bbox_emu": [
+    2595163,
+    2044077,
+    4590865,
+    1938992
+   ],
+   "geometry": "rect",
+   "text": {
+    "anchor": "t",
+    "wrap": "square",
+    "insets_in": {
+     "lIns": 0.1,
+     "tIns": 0.05,
+     "rIns": 0.1,
+     "bIns": 0.05
+    },
+    "autofit": "spAutoFit",
+    "paragraphs": [
+     {
+      "text": "• 4vs2",
+      "align": "l",
+      "marL_in": 0.0,
+      "indent_in": 0.0,
+      "level": 0,
+      "bullet": null,
+      "lnSpc": {
+       "pct": 100.0
+      },
+      "spcBef": {
+       "pt": 0.0
+      },
+      "spcAft": {
+       "pt": 0.0
+      },
+      "runs": [
+       {
+        "text": "• 4vs2",
+        "size_pt": 12.0,
+        "bold": false,
+        "italic": false,
+        "font": "Calibri",
+        "color": {
+         "hex": "#000000",
+         "theme_ref": "preset:black"
+        }
+       }
+      ]
+     },
+     {
+      "text": "• jeu au sol obligatoire ",
+      "align": "l",
+      "marL_in": 0.0,
+      "indent_in": 0.0,
+      "level": 0,
+      "bullet": null,
+      "lnSpc": {
+       "pct": 100.0
+      },
+      "spcBef": {
+       "pt": 0.0
+      },
+      "spcAft": {
+       "pt": 0.0
+      },
+      "runs": [
+       {
+        "text": "• jeu au sol obligatoire ",
+        "size_pt": 12.0,
+        "bold": false,
+        "italic": false,
+        "font": "Calibri",
+        "color": {
+         "hex": "#000000",
+         "theme_ref": "preset:black"
+        }
+       }
+      ]
+     },
+     {
+      "text": "•occuper tous les espaces du carré",
+      "align": "l",
+      "marL_in": 0.0,
+      "indent_in": 0.0,
+      "level": 0,
+      "bullet": null,
+      "lnSpc": {
+       "pct": 100.0
+      },
+      "spcBef": {
+       "pt": 0.0
+      },
+      "spcAft": {
+       "pt": 0.0
+      },
+      "runs": [
+       {
+        "text": "•occuper tous les espaces du carré",
+        "size_pt": 12.0,
+        "bold": false,
+        "italic": false,
+        "font": "Calibri",
+        "color": {
+         "hex": "#000000",
+         "theme_ref": "preset:black"
+        }
+       }
+      ]
+     },
+     {
+      "text": "• les joueurs sont situés à l’extérieur du carré",
+      "align": "l",
+      "marL_in": 0.0,
+      "indent_in": 0.0,
+      "level": 0,
+      "bullet": null,
+      "lnSpc": {
+       "pct": 100.0
+      },
+      "spcBef": {
+       "pt": 0.0
+      },
+      "spcAft": {
+       "pt": 0.0
+      },
+      "runs": [
+       {
+        "text": "• les joueurs sont situés à l’extérieur du carré",
+        "size_pt": 12.0,
+        "bold": false,
+        "italic": false,
+        "font": "Calibri",
+        "color": {
+         "hex": "#000000",
+         "theme_ref": "preset:black"
+        }
+       }
+      ]
+     },
+     {
+      "text": "• Thème 1 jeu libre ",
+      "align": "l",
+      "marL_in": 0.0,
+      "indent_in": 0.0,
+      "level": 0,
+      "bullet": null,
+      "lnSpc": {
+       "pct": 100.0
+      },
+      "spcBef": {
+       "pt": 0.0
+      },
+      "spcAft": {
+       "pt": 0.0
+      },
+      "runs": [
+       {
+        "text": "• Thème 1 jeu libre ",
+        "size_pt": 12.0,
+        "bold": false,
+        "italic": false,
+        "font": "Calibri",
+        "color": {
+         "hex": "#000000",
+         "theme_ref": "preset:black"
+        }
+       }
+      ]
+     },
+     {
+      "text": "• Thème 2 max 2 touches",
+      "align": "l",
+      "marL_in": 0.0,
+      "indent_in": 0.0,
+      "level": 0,
+      "bullet": null,
+      "lnSpc": {
+       "pct": 100.0
+      },
+      "spcBef": {
+       "pt": 0.0
+      },
+      "spcAft": {
+       "pt": 0.0
+      },
+      "runs": [
+       {
+        "text": "• Thème 2 max 2 touches",
+        "size_pt": 12.0,
+        "bold": false,
+        "italic": false,
+        "font": "Calibri",
+        "color": {
+         "hex": "#000000",
+         "theme_ref": "preset:black"
+        }
+       }
+      ]
+     },
+     {
+      "text": "• Thème 3 après chaque passe changer de coté ",
+      "align": "l",
+      "marL_in": 0.0,
+      "indent_in": 0.0,
+      "level": 0,
+      "bullet": null,
+      "lnSpc": {
+       "pct": 100.0
+      },
+      "spcBef": {
+       "pt": 0.0
+      },
+      "spcAft": {
+       "pt": 0.0
+      },
+      "runs": [
+       {
+        "text": "• Thème 3 après chaque passe changer de coté ",
+        "size_pt": 12.0,
+        "bold": false,
+        "italic": false,
+        "font": "Calibri",
+        "color": {
+         "hex": "#000000",
+         "theme_ref": "preset:black"
+        }
+       }
+      ]
+     },
+     {
+      "text": "",
+      "align": "l",
+      "marL_in": 0.0,
+      "indent_in": 0.0,
+      "level": 0,
+      "bullet": null,
+      "lnSpc": {
+       "pct": 100.0
+      },
+      "spcBef": {
+       "pt": 0.0
+      },
+      "spcAft": {
+       "pt": 0.0
+      },
+      "runs": [],
+      "end_props": {
+       "size_pt": 12.0,
+       "bold": false,
+       "italic": false,
+       "font": "Calibri",
+       "color": {
+        "hex": "#000000",
+        "theme_ref": "preset:black"
+       }
+      }
+     },
+     {
+      "text": "",
+      "align": "l",
+      "marL_in": 0.0,
+      "indent_in": 0.0,
+      "level": 0,
+      "bullet": null,
+      "lnSpc": {
+       "pct": 100.0
+      },
+      "spcBef": {
+       "pt": 0.0
+      },
+      "spcAft": {
+       "pt": 0.0
+      },
+      "runs": [],
+      "end_props": {
+       "size_pt": 12.0,
+       "bold": false,
+       "italic": false,
+       "font": "Calibri",
+       "color": {
+        "hex": "#000000",
+        "theme_ref": "preset:black"
+       }
+      }
+     },
+     {
+      "text": "",
+      "align": "l",
+      "marL_in": 0.0,
+      "indent_in": 0.0,
+      "level": 0,
+      "bullet": null,
+      "lnSpc": {
+       "pct": 100.0
+      },
+      "spcBef": {
+       "pt": 0.0
+      },
+      "spcAft": {
+       "pt": 0.0
+      },
+      "runs": [],
+      "end_props": {
+       "size_pt": 12.0,
+       "bold": false,
+       "italic": false,
+       "font": "Roboto",
+       "color": {
+        "hex": "#000000",
+        "theme_ref": "preset:black"
+       }
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "33",
+   "name": "Titre_Variables",
+   "kind": "sp",
+   "bbox_in": {
+    "x": 1.641,
+    "y": 5.477,
+    "w": 4.902,
+    "h": 0.353,
+    "right": 6.543,
+    "bottom": 5.831
+   },
+   "bbox_emu": [
+    1500461,
+    5008535,
+    4482296,
+    323165
+   ],
+   "geometry": "rect",
+   "is_textbox": true,
+   "fill": {
+    "type": "solid",
+    "color": {
+     "hex": "#767171",
+     "theme_ref": "bg2",
+     "modifiers": [
+      {
+       "lumMod": 0.5
+      }
+     ]
+    }
+   },
+   "effects": [
+    {
+     "type": "outerShdw",
+     "blurRad_pt": 4.0,
+     "dist_pt": 3.0,
+     "dir_deg": 90.0,
+     "color": {
+      "hex": "#000000",
+      "theme_ref": "preset:black",
+      "modifiers": [
+       {
+        "alpha": 0.4
+       }
+      ],
+      "alpha": 0.4
+     }
+    }
+   ],
+   "text": {
+    "anchor": "ctr",
+    "wrap": "square",
+    "insets_in": {
+     "lIns": 0.1,
+     "tIns": 0.05,
+     "rIns": 0.1,
+     "bIns": 0.05
+    },
+    "autofit": "spAutoFit",
+    "paragraphs": [
+     {
+      "text": "VARIABLES",
+      "align": "ctr",
+      "marL_in": 0.0,
+      "indent_in": 0.0,
+      "level": 0,
+      "bullet": null,
+      "lnSpc": {
+       "pct": 100.0
+      },
+      "spcBef": {
+       "pt": 15.0
+      },
+      "spcAft": {
+       "pt": 15.0
+      },
+      "runs": [
+       {
+        "text": "VARIABLES",
+        "size_pt": 15.0,
+        "bold": true,
+        "italic": false,
+        "font": "Roboto",
+        "color": {
+         "hex": "#FFFFFF",
+         "theme_ref": "preset:white"
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "38",
+   "name": "Titre_Comportements",
+   "kind": "sp",
+   "bbox_in": {
+    "x": 6.704,
+    "y": 5.482,
+    "w": 6.461,
+    "h": 0.353,
+    "right": 13.164,
+    "bottom": 5.835
+   },
+   "bbox_emu": [
+    6129740,
+    5012513,
+    5907767,
+    323165
+   ],
+   "geometry": "rect",
+   "is_textbox": true,
+   "fill": {
+    "type": "solid",
+    "color": {
+     "hex": "#767171",
+     "theme_ref": "bg2",
+     "modifiers": [
+      {
+       "lumMod": 0.5
+      }
+     ]
+    }
+   },
+   "effects": [
+    {
+     "type": "outerShdw",
+     "blurRad_pt": 4.0,
+     "dist_pt": 3.0,
+     "dir_deg": 90.0,
+     "color": {
+      "hex": "#000000",
+      "theme_ref": "preset:black",
+      "modifiers": [
+       {
+        "alpha": 0.4
+       }
+      ],
+      "alpha": 0.4
+     }
+    }
+   ],
+   "text": {
+    "anchor": "ctr",
+    "wrap": "square",
+    "insets_in": {
+     "lIns": 0.1,
+     "tIns": 0.05,
+     "rIns": 0.1,
+     "bIns": 0.05
+    },
+    "autofit": "spAutoFit",
+    "paragraphs": [
+     {
+      "text": "COMPORTEMENTS ATTENDUS",
+      "align": "ctr",
+      "marL_in": 0.0,
+      "indent_in": 0.0,
+      "level": 0,
+      "bullet": null,
+      "lnSpc": {
+       "pct": 100.0
+      },
+      "spcBef": {
+       "pt": 15.0
+      },
+      "spcAft": {
+       "pt": 15.0
+      },
+      "runs": [
+       {
+        "text": "COMPORTEMENTS ATTENDUS",
+        "size_pt": 15.0,
+        "bold": true,
+        "italic": false,
+        "font": "Roboto",
+        "color": {
+         "hex": "#FFFFFF",
+         "theme_ref": "preset:white"
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "34",
+   "name": "CadreComportement",
+   "kind": "sp",
+   "bbox_in": {
+    "x": 6.704,
+    "y": 5.831,
+    "w": 6.461,
+    "h": 1.531,
+    "right": 13.164,
+    "bottom": 7.362
+   },
+   "bbox_emu": [
+    6129741,
+    5331700,
+    5907764,
+    1399833
+   ],
+   "geometry": "rect",
+   "fill": {
+    "type": "solid",
+    "color": {
+     "hex": "#D9D9D9",
+     "theme_ref": "bg1",
+     "modifiers": [
+      {
+       "lumMod": 0.85
+      }
+     ]
+    }
+   },
+   "line": {
+    "type": "none"
+   },
+   "style_refs": {
+    "lnRef": {
+     "idx": "2",
+     "color": {
+      "hex": "#0A111D",
+      "theme_ref": "accent1",
+      "modifiers": [
+       {
+        "shade": 0.15
+       }
+      ]
+     }
+    },
+    "fillRef": {
+     "idx": "1",
+     "color": {
+      "hex": "#4472C4",
+      "theme_ref": "accent1"
+     }
+    },
+    "effectRef": {
+     "idx": "0",
+     "color": {
+      "hex": "#4472C4",
+      "theme_ref": "accent1"
+     }
+    },
+    "fontRef": {
+     "idx": "minor",
+     "color": {
+      "hex": "#FFFFFF",
+      "theme_ref": "lt1"
+     }
+    }
+   },
+   "text_empty": true,
+   "default_text_props": {
+    "size_pt": 12.0,
+    "bold": false,
+    "italic": false,
+    "font": "Roboto",
+    "color": {
+     "hex": "#000000",
+     "theme_ref": "preset:black"
+    }
+   }
+  },
+  {
+   "id": "50",
+   "name": "Text_Legende",
+   "kind": "graphicFrame",
+   "bbox_in": {
+    "x": 8.826,
+    "y": 3.931,
+    "w": 3.857,
+    "h": 0.433,
+    "right": 12.683,
+    "bottom": 4.365
+   },
+   "bbox_emu": [
+    8070124,
+    3594829,
+    3527056,
+    396240
+   ],
+   "table": {
+    "col_widths_in": [
+     1.286,
+     1.286,
+     1.286
+    ],
+    "rows": [
+     {
+      "height_in": 0.406,
+      "cells": [
+       {
+        "anchor": "t",
+        "wrap": "square",
+        "insets_in": {
+         "lIns": 0.1,
+         "tIns": 0.05,
+         "rIns": 0.1,
+         "bIns": 0.05
+        },
+        "autofit": null,
+        "paragraphs": [
+         {
+          "text": "Déplacement joueur",
+          "align": "ctr",
+          "runs": [
+           {
+            "text": "Déplacement joueur",
+            "size_pt": 10.0,
+            "bold": false,
+            "italic": false,
+            "font": "Calibri"
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "anchor": "t",
+        "wrap": "square",
+        "insets_in": {
+         "lIns": 0.1,
+         "tIns": 0.05,
+         "rIns": 0.1,
+         "bIns": 0.05
+        },
+        "autofit": null,
+        "paragraphs": [
+         {
+          "text": "Déplacement ballon",
+          "align": "ctr",
+          "marL_in": 0.0,
+          "indent_in": 0.0,
+          "level": 0,
+          "bullet": null,
+          "lnSpc": {
+           "pct": 100.0
+          },
+          "spcBef": {
+           "pt": 0.0
+          },
+          "spcAft": {
+           "pt": 0.0
+          },
+          "runs": [
+           {
+            "text": "Déplacement ballon",
+            "size_pt": 10.0,
+            "bold": false,
+            "italic": false,
+            "font": "Calibri"
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "anchor": "t",
+        "wrap": "square",
+        "insets_in": {
+         "lIns": 0.1,
+         "tIns": 0.05,
+         "rIns": 0.1,
+         "bIns": 0.05
+        },
+        "autofit": null,
+        "paragraphs": [
+         {
+          "text": "Déplacement joueur / ballon",
+          "align": "ctr",
+          "marL_in": 0.0,
+          "indent_in": 0.0,
+          "level": 0,
+          "bullet": null,
+          "lnSpc": {
+           "pct": 100.0
+          },
+          "spcBef": {
+           "pt": 0.0
+          },
+          "spcAft": {
+           "pt": 0.0
+          },
+          "runs": [
+           {
+            "text": "Déplacement joueur / ballon",
+            "size_pt": 10.0,
+            "bold": false,
+            "italic": false,
+            "font": "Calibri"
+           }
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "54",
+   "name": "LegendeSign2",
+   "kind": "cxnSp",
+   "bbox_in": {
+    "x": 10.392,
+    "y": 3.869,
+    "w": 0.779,
+    "h": 0.0,
+    "right": 11.171,
+    "bottom": 3.869
+   },
+   "bbox_emu": [
+    9502333,
+    3537363,
+    712565,
+    0
+   ],
+   "geometry": "straightConnector1",
+   "line": {
+    "width_pt": 2.25,
+    "type": "solid",
+    "color": {
+     "hex": "#000000",
+     "theme_ref": "tx1"
+    },
+    "dash": "solid",
+    "tailEnd": {
+     "type": "triangle",
+     "w": null,
+     "len": null
+    }
+   },
+   "style_refs": {
+    "lnRef": {
+     "idx": "1",
+     "color": {
+      "hex": "#4472C4",
+      "theme_ref": "accent1"
+     }
+    },
+    "fillRef": {
+     "idx": "0",
+     "color": {
+      "hex": "#4472C4",
+      "theme_ref": "accent1"
+     }
+    },
+    "effectRef": {
+     "idx": "0",
+     "color": {
+      "hex": "#4472C4",
+      "theme_ref": "accent1"
+     }
+    },
+    "fontRef": {
+     "idx": "minor",
+     "color": {
+      "hex": "#000000",
+      "theme_ref": "tx1"
+     }
+    }
+   }
+  },
+  {
+   "id": "55",
+   "name": "LegendeSign3",
+   "kind": "sp",
+   "bbox_in": {
+    "x": 11.574,
+    "y": 3.848,
+    "w": 0.937,
+    "h": 0.05,
+    "right": 12.511,
+    "bottom": 3.898
+   },
+   "bbox_emu": [
+    10583297,
+    3518359,
+    857180,
+    45719
+   ],
+   "geometry": "custom",
+   "fill": {
+    "type": "none"
+   },
+   "line": {
+    "width_pt": 2.25,
+    "type": "solid",
+    "color": {
+     "hex": "#000000"
+    },
+    "tailEnd": {
+     "type": "triangle",
+     "w": "med",
+     "len": "med"
+    }
+   },
+   "text_empty": true,
+   "default_text_props": {
+    "size_pt": 18.0,
+    "bold": false,
+    "italic": false,
+    "font": "Roboto",
+    "color": {
+     "hex": "#000000",
+     "theme_ref": "preset:black"
+    }
+   }
+  },
+  {
+   "id": "58",
+   "name": "Titre_ButDuJeu",
+   "kind": "sp",
+   "bbox_in": {
+    "x": 2.759,
+    "y": 0.569,
+    "w": 5.332,
+    "h": 0.353,
+    "right": 8.091,
+    "bottom": 0.922
+   },
+   "bbox_emu": [
+    2522832,
+    519963,
+    4875398,
+    323165
+   ],
+   "geometry": "rect",
+   "is_textbox": true,
+   "fill": {
+    "type": "solid",
+    "color": {
+     "hex": "#44546A"
+    }
+   },
+   "effects": [
+    {
+     "type": "outerShdw",
+     "blurRad_pt": 4.0,
+     "dist_pt": 3.0,
+     "dir_deg": 90.0,
+     "color": {
+      "hex": "#000000",
+      "theme_ref": "preset:black",
+      "modifiers": [
+       {
+        "alpha": 0.4
+       }
+      ],
+      "alpha": 0.4
+     }
+    }
+   ],
+   "text": {
+    "anchor": "ctr",
+    "wrap": "square",
+    "insets_in": {
+     "lIns": 0.1,
+     "tIns": 0.05,
+     "rIns": 0.1,
+     "bIns": 0.05
+    },
+    "autofit": "spAutoFit",
+    "paragraphs": [
+     {
+      "text": "BUT DU JEU",
+      "align": "ctr",
+      "marL_in": 0.0,
+      "indent_in": 0.0,
+      "level": 0,
+      "bullet": null,
+      "lnSpc": {
+       "pct": 100.0
+      },
+      "spcBef": {
+       "pt": 15.0
+      },
+      "spcAft": {
+       "pt": 15.0
+      },
+      "runs": [
+       {
+        "text": "BUT DU JEU",
+        "size_pt": 15.0,
+        "bold": true,
+        "italic": false,
+        "font": "Roboto",
+        "color": {
+         "hex": "#FFFFFF",
+         "theme_ref": "preset:white"
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "59",
+   "name": "Text_ButDuJeu",
+   "kind": "sp",
+   "bbox_in": {
+    "x": 2.838,
+    "y": 0.931,
+    "w": 5.127,
+    "h": 0.909,
+    "right": 7.966,
+    "bottom": 1.839
+   },
+   "bbox_emu": [
+    2595163,
+    850944,
+    4688543,
+    830997
+   ],
+   "geometry": "rect",
+   "text": {
+    "anchor": "t",
+    "wrap": "square",
+    "insets_in": {
+     "lIns": 0.1,
+     "tIns": 0.05,
+     "rIns": 0.1,
+     "bIns": 0.05
+    },
+    "autofit": "spAutoFit",
+    "paragraphs": [
+     {
+      "text": "En conservation",
+      "align": "l",
+      "marL_in": 0.188,
+      "indent_in": -0.188,
+      "level": 0,
+      "bullet": {
+       "char": "•",
+       "font": "Arial"
+      },
+      "lnSpc": {
+       "pct": 100.0
+      },
+      "spcBef": {
+       "pt": 0.0
+      },
+      "spcAft": {
+       "pt": 0.0
+      },
+      "runs": [
+       {
+        "text": "En conservation",
+        "size_pt": 12.0,
+        "bold": false,
+        "italic": false,
+        "font": "Calibri",
+        "color": {
+         "hex": "#000000",
+         "theme_ref": "preset:black"
+        }
+       }
+      ]
+     },
+     {
+      "text": " 10 passes = 1pt ",
+      "align": "l",
+      "marL_in": 0.188,
+      "indent_in": -0.188,
+      "level": 0,
+      "bullet": {
+       "char": "•",
+       "font": "Arial"
+      },
+      "lnSpc": {
+       "pct": 100.0
+      },
+      "spcBef": {
+       "pt": 0.0
+      },
+      "spcAft": {
+       "pt": 0.0
+      },
+      "runs": [
+       {
+        "text": " 10 passes = 1pt ",
+        "size_pt": 12.0,
+        "bold": false,
+        "italic": false,
+        "font": "Calibri",
+        "color": {
+         "hex": "#000000",
+         "theme_ref": "preset:black"
+        }
+       }
+      ]
+     },
+     {
+      "text": "Défenseur ",
+      "align": "l",
+      "marL_in": 0.188,
+      "indent_in": -0.188,
+      "level": 0,
+      "bullet": {
+       "char": "•",
+       "font": "Arial"
+      },
+      "lnSpc": {
+       "pct": 100.0
+      },
+      "spcBef": {
+       "pt": 0.0
+      },
+      "spcAft": {
+       "pt": 0.0
+      },
+      "runs": [
+       {
+        "text": "Défenseur ",
+        "size_pt": 12.0,
+        "bold": false,
+        "italic": false,
+        "font": "Calibri",
+        "color": {
+         "hex": "#000000",
+         "theme_ref": "preset:black"
+        }
+       }
+      ]
+     },
+     {
+      "text": " intercepter = 1 pt",
+      "align": "l",
+      "marL_in": 0.188,
+      "indent_in": -0.188,
+      "level": 0,
+      "bullet": {
+       "char": "•",
+       "font": "Arial"
+      },
+      "lnSpc": {
+       "pct": 100.0
+      },
+      "spcBef": {
+       "pt": 0.0
+      },
+      "spcAft": {
+       "pt": 0.0
+      },
+      "runs": [
+       {
+        "text": " intercepter = 1 pt",
+        "size_pt": 12.0,
+        "bold": false,
+        "italic": false,
+        "font": "Calibri",
+        "color": {
+         "hex": "#000000",
+         "theme_ref": "preset:black"
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "60",
+   "name": "LegendeSign1",
+   "kind": "cxnSp",
+   "bbox_in": {
+    "x": 9.076,
+    "y": 3.867,
+    "w": 0.842,
+    "h": 0.0,
+    "right": 9.918,
+    "bottom": 3.867
+   },
+   "bbox_emu": [
+    8299380,
+    3536190,
+    769503,
+    0
+   ],
+   "geometry": "straightConnector1",
+   "line": {
+    "width_pt": 2.25,
+    "type": "solid",
+    "color": {
+     "hex": "#000000",
+     "theme_ref": "tx1"
+    },
+    "dash": "dash",
+    "tailEnd": {
+     "type": "triangle",
+     "w": null,
+     "len": null
+    }
+   },
+   "style_refs": {
+    "lnRef": {
+     "idx": "1",
+     "color": {
+      "hex": "#4472C4",
+      "theme_ref": "accent1"
+     }
+    },
+    "fillRef": {
+     "idx": "0",
+     "color": {
+      "hex": "#4472C4",
+      "theme_ref": "accent1"
+     }
+    },
+    "effectRef": {
+     "idx": "0",
+     "color": {
+      "hex": "#4472C4",
+      "theme_ref": "accent1"
+     }
+    },
+    "fontRef": {
+     "idx": "minor",
+     "color": {
+      "hex": "#000000",
+      "theme_ref": "tx1"
+     }
+    }
+   }
+  },
+  {
+   "id": "48",
+   "name": "TeamColor3NBJoueurs",
+   "kind": "sp",
+   "bbox_in": {
+    "x": 0.412,
+    "y": 2.26,
+    "w": 0.975,
+    "h": 0.303,
+    "right": 1.387,
+    "bottom": 2.563
+   },
+   "bbox_emu": [
+    377065,
+    2066414,
+    891440,
+    276999
+   ],
+   "geometry": "rect",
+   "is_textbox": true,
+   "fill": {
+    "type": "none"
+   },
+   "text": {
+    "anchor": "t",
+    "wrap": "square",
+    "insets_in": {
+     "lIns": 0.1,
+     "tIns": 0.05,
+     "rIns": 0.1,
+     "bIns": 0.05
+    },
+    "autofit": "spAutoFit",
+    "paragraphs": [
+     {
+      "text": "x joueurs",
+      "align": "l",
+      "marL_in": 0.0,
+      "indent_in": 0.0,
+      "level": 0,
+      "bullet": null,
+      "lnSpc": {
+       "pct": 100.0
+      },
+      "spcBef": {
+       "pt": 0.0
+      },
+      "spcAft": {
+       "pt": 0.0
+      },
+      "runs": [
+       {
+        "text": "x joueurs",
+        "size_pt": 12.0,
+        "bold": false,
+        "italic": false,
+        "font": "Roboto",
+        "color": {
+         "hex": "#000000",
+         "theme_ref": "preset:black"
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "64",
+   "name": "TeamColor4NBJoueurs",
+   "kind": "sp",
+   "bbox_in": {
+    "x": 0.41,
+    "y": 2.646,
+    "w": 1.074,
+    "h": 0.303,
+    "right": 1.484,
+    "bottom": 2.949
+   },
+   "bbox_emu": [
+    374841,
+    2419130,
+    981905,
+    276999
+   ],
+   "geometry": "rect",
+   "is_textbox": true,
+   "fill": {
+    "type": "none"
+   },
+   "text": {
+    "anchor": "t",
+    "wrap": "square",
+    "insets_in": {
+     "lIns": 0.1,
+     "tIns": 0.05,
+     "rIns": 0.1,
+     "bIns": 0.05
+    },
+    "autofit": "spAutoFit",
+    "paragraphs": [
+     {
+      "text": "6 joueurs",
+      "align": "l",
+      "marL_in": 0.0,
+      "indent_in": 0.0,
+      "level": 0,
+      "bullet": null,
+      "lnSpc": {
+       "pct": 100.0
+      },
+      "spcBef": {
+       "pt": 0.0
+      },
+      "spcAft": {
+       "pt": 0.0
+      },
+      "runs": [
+       {
+        "text": "6 joueurs",
+        "size_pt": 12.0,
+        "bold": false,
+        "italic": false,
+        "font": "Roboto",
+        "color": {
+         "hex": "#000000",
+         "theme_ref": "preset:black"
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "4",
+   "name": "TeamColor3",
+   "kind": "sp",
+   "bbox_in": {
+    "x": 0.181,
+    "y": 2.315,
+    "w": 0.197,
+    "h": 0.197,
+    "right": 0.378,
+    "bottom": 2.512
+   },
+   "bbox_emu": [
+    165365,
+    2116899,
+    180000,
+    180000
+   ],
+   "geometry": "ellipse",
+   "fill": {
+    "type": "solid",
+    "color": {
+     "hex": "#000000",
+     "theme_ref": "tx1"
+    }
+   },
+   "line": {
+    "type": "solid",
+    "color": {
+     "hex": "#FFFFFF",
+     "theme_ref": "bg1"
+    }
+   },
+   "style_refs": {
+    "lnRef": {
+     "idx": "2",
+     "color": {
+      "hex": "#0A111D",
+      "theme_ref": "accent1",
+      "modifiers": [
+       {
+        "shade": 0.15
+       }
+      ]
+     }
+    },
+    "fillRef": {
+     "idx": "1",
+     "color": {
+      "hex": "#4472C4",
+      "theme_ref": "accent1"
+     }
+    },
+    "effectRef": {
+     "idx": "0",
+     "color": {
+      "hex": "#4472C4",
+      "theme_ref": "accent1"
+     }
+    },
+    "fontRef": {
+     "idx": "minor",
+     "color": {
+      "hex": "#FFFFFF",
+      "theme_ref": "lt1"
+     }
+    }
+   },
+   "text_empty": true,
+   "default_text_props": {
+    "size_pt": 18.0,
+    "bold": false,
+    "italic": false,
+    "font": "Roboto",
+    "color": {
+     "hex": "#FFFFFF",
+     "theme_ref": "preset:white"
+    }
+   }
+  },
+  {
+   "id": "5",
+   "name": "TeamColor4",
+   "kind": "sp",
+   "bbox_in": {
+    "x": 0.181,
+    "y": 2.699,
+    "w": 0.197,
+    "h": 0.197,
+    "right": 0.378,
+    "bottom": 2.896
+   },
+   "bbox_emu": [
+    165365,
+    2467996,
+    180000,
+    180000
+   ],
+   "geometry": "ellipse",
+   "fill": {
+    "type": "solid",
+    "color": {
+     "hex": "#4472C4",
+     "theme_ref": "accent1"
+    }
+   },
+   "line": {
+    "type": "solid",
+    "color": {
+     "hex": "#FFFFFF",
+     "theme_ref": "bg1"
+    }
+   },
+   "style_refs": {
+    "lnRef": {
+     "idx": "2",
+     "color": {
+      "hex": "#0A111D",
+      "theme_ref": "accent1",
+      "modifiers": [
+       {
+        "shade": 0.15
+       }
+      ]
+     }
+    },
+    "fillRef": {
+     "idx": "1",
+     "color": {
+      "hex": "#4472C4",
+      "theme_ref": "accent1"
+     }
+    },
+    "effectRef": {
+     "idx": "0",
+     "color": {
+      "hex": "#4472C4",
+      "theme_ref": "accent1"
+     }
+    },
+    "fontRef": {
+     "idx": "minor",
+     "color": {
+      "hex": "#FFFFFF",
+      "theme_ref": "lt1"
+     }
+    }
+   },
+   "text_empty": true,
+   "default_text_props": {
+    "size_pt": 18.0,
+    "bold": false,
+    "italic": false,
+    "font": "Roboto",
+    "color": {
+     "hex": "#FFFFFF",
+     "theme_ref": "preset:white"
+    }
+   }
+  },
+  {
+   "id": "6",
+   "name": "TeamColor2NBJoueurs",
+   "kind": "sp",
+   "bbox_in": {
+    "x": 1.653,
+    "y": 2.265,
+    "w": 0.975,
+    "h": 0.303,
+    "right": 2.628,
+    "bottom": 2.568
+   },
+   "bbox_emu": [
+    1511447,
+    2071061,
+    891440,
+    276999
+   ],
+   "geometry": "rect",
+   "is_textbox": true,
+   "fill": {
+    "type": "none"
+   },
+   "text": {
+    "anchor": "t",
+    "wrap": "square",
+    "insets_in": {
+     "lIns": 0.1,
+     "tIns": 0.05,
+     "rIns": 0.1,
+     "bIns": 0.05
+    },
+    "autofit": "spAutoFit",
+    "paragraphs": [
+     {
+      "text": "6 joueurs",
+      "align": "l",
+      "marL_in": 0.0,
+      "indent_in": 0.0,
+      "level": 0,
+      "bullet": null,
+      "lnSpc": {
+       "pct": 100.0
+      },
+      "spcBef": {
+       "pt": 0.0
+      },
+      "spcAft": {
+       "pt": 0.0
+      },
+      "runs": [
+       {
+        "text": "6 joueurs",
+        "size_pt": 12.0,
+        "bold": false,
+        "italic": false,
+        "font": "Roboto",
+        "color": {
+         "hex": "#000000",
+         "theme_ref": "preset:black"
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "7",
+   "name": "TeamColor1NBJoueurs",
+   "kind": "sp",
+   "bbox_in": {
+    "x": 1.651,
+    "y": 2.651,
+    "w": 1.074,
+    "h": 0.303,
+    "right": 2.724,
+    "bottom": 2.954
+   },
+   "bbox_emu": [
+    1509223,
+    2423777,
+    981905,
+    276999
+   ],
+   "geometry": "rect",
+   "is_textbox": true,
+   "fill": {
+    "type": "none"
+   },
+   "text": {
+    "anchor": "t",
+    "wrap": "square",
+    "insets_in": {
+     "lIns": 0.1,
+     "tIns": 0.05,
+     "rIns": 0.1,
+     "bIns": 0.05
+    },
+    "autofit": "spAutoFit",
+    "paragraphs": [
+     {
+      "text": "6 joueurs",
+      "align": "l",
+      "marL_in": 0.0,
+      "indent_in": 0.0,
+      "level": 0,
+      "bullet": null,
+      "lnSpc": {
+       "pct": 100.0
+      },
+      "spcBef": {
+       "pt": 0.0
+      },
+      "spcAft": {
+       "pt": 0.0
+      },
+      "runs": [
+       {
+        "text": "6 joueurs",
+        "size_pt": 12.0,
+        "bold": false,
+        "italic": false,
+        "font": "Roboto",
+        "color": {
+         "hex": "#000000",
+         "theme_ref": "preset:black"
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "8",
+   "name": "TeamColor2",
+   "kind": "sp",
+   "bbox_in": {
+    "x": 1.421,
+    "y": 2.32,
+    "w": 0.197,
+    "h": 0.197,
+    "right": 1.618,
+    "bottom": 2.517
+   },
+   "bbox_emu": [
+    1299747,
+    2121546,
+    180000,
+    180000
+   ],
+   "geometry": "ellipse",
+   "fill": {
+    "type": "solid",
+    "color": {
+     "hex": "#C00000"
+    }
+   },
+   "line": {
+    "type": "solid",
+    "color": {
+     "hex": "#FFFFFF",
+     "theme_ref": "bg1"
+    }
+   },
+   "style_refs": {
+    "lnRef": {
+     "idx": "2",
+     "color": {
+      "hex": "#0A111D",
+      "theme_ref": "accent1",
+      "modifiers": [
+       {
+        "shade": 0.15
+       }
+      ]
+     }
+    },
+    "fillRef": {
+     "idx": "1",
+     "color": {
+      "hex": "#4472C4",
+      "theme_ref": "accent1"
+     }
+    },
+    "effectRef": {
+     "idx": "0",
+     "color": {
+      "hex": "#4472C4",
+      "theme_ref": "accent1"
+     }
+    },
+    "fontRef": {
+     "idx": "minor",
+     "color": {
+      "hex": "#FFFFFF",
+      "theme_ref": "lt1"
+     }
+    }
+   },
+   "text_empty": true,
+   "default_text_props": {
+    "size_pt": 18.0,
+    "bold": false,
+    "italic": false,
+    "font": "Roboto",
+    "color": {
+     "hex": "#FFFFFF",
+     "theme_ref": "preset:white"
+    }
+   }
+  },
+  {
+   "id": "9",
+   "name": "TeamColor1",
+   "kind": "sp",
+   "bbox_in": {
+    "x": 1.421,
+    "y": 2.704,
+    "w": 0.197,
+    "h": 0.197,
+    "right": 1.618,
+    "bottom": 2.901
+   },
+   "bbox_emu": [
+    1299747,
+    2472643,
+    180000,
+    180000
+   ],
+   "geometry": "ellipse",
+   "fill": {
+    "type": "solid",
+    "color": {
+     "hex": "#FFC000",
+     "theme_ref": "accent4"
+    }
+   },
+   "line": {
+    "type": "solid",
+    "color": {
+     "hex": "#FFFFFF",
+     "theme_ref": "bg1"
+    }
+   },
+   "style_refs": {
+    "lnRef": {
+     "idx": "2",
+     "color": {
+      "hex": "#0A111D",
+      "theme_ref": "accent1",
+      "modifiers": [
+       {
+        "shade": 0.15
+       }
+      ]
+     }
+    },
+    "fillRef": {
+     "idx": "1",
+     "color": {
+      "hex": "#4472C4",
+      "theme_ref": "accent1"
+     }
+    },
+    "effectRef": {
+     "idx": "0",
+     "color": {
+      "hex": "#4472C4",
+      "theme_ref": "accent1"
+     }
+    },
+    "fontRef": {
+     "idx": "minor",
+     "color": {
+      "hex": "#FFFFFF",
+      "theme_ref": "lt1"
+     }
+    }
+   },
+   "text_empty": true,
+   "default_text_props": {
+    "size_pt": 18.0,
+    "bold": false,
+    "italic": false,
+    "font": "Roboto",
+    "color": {
+     "hex": "#FFFFFF",
+     "theme_ref": "preset:white"
+    }
+   }
+  },
+  {
+   "id": "11",
+   "name": "TypeMoment",
+   "kind": "sp",
+   "bbox_in": {
+    "x": 1.536,
+    "y": 0.166,
+    "w": 1.125,
+    "h": 0.278,
+    "right": 2.661,
+    "bottom": 0.444
+   },
+   "bbox_emu": [
+    1404702,
+    151647,
+    1028529,
+    253916
+   ],
+   "geometry": "rect",
+   "is_textbox": true,
+   "fill": {
+    "type": "solid",
+    "color": {
+     "hex": "#FFC000",
+     "theme_ref": "accent4"
+    }
+   },
+   "effects": [
+    {
+     "type": "outerShdw",
+     "blurRad_pt": 4.0,
+     "dist_pt": 3.0,
+     "dir_deg": 90.0,
+     "color": {
+      "hex": "#000000",
+      "theme_ref": "preset:black",
+      "modifiers": [
+       {
+        "alpha": 0.4
+       }
+      ],
+      "alpha": 0.4
+     }
+    }
+   ],
+   "text": {
+    "anchor": "ctr",
+    "wrap": "square",
+    "insets_in": {
+     "lIns": 0.1,
+     "tIns": 0.05,
+     "rIns": 0.1,
+     "bIns": 0.05
+    },
+    "autofit": "spAutoFit",
+    "paragraphs": [
+     {
+      "text": "Echauffement ",
+      "align": "ctr",
+      "marL_in": 0.0,
+      "indent_in": 0.0,
+      "level": 0,
+      "bullet": null,
+      "lnSpc": {
+       "pct": 100.0
+      },
+      "spcBef": {
+       "pt": 15.0
+      },
+      "spcAft": {
+       "pt": 15.0
+      },
+      "runs": [
+       {
+        "text": "Echauffement ",
+        "size_pt": 10.5,
+        "bold": false,
+        "italic": false,
+        "font": "Roboto",
+        "color": {
+         "hex": "#000000",
+         "theme_ref": "preset:black"
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "12",
+   "name": "TypeExercice",
+   "kind": "sp",
+   "bbox_in": {
+    "x": 0.119,
+    "y": 0.168,
+    "w": 1.35,
+    "h": 0.286,
+    "right": 1.469,
+    "bottom": 0.455
+   },
+   "bbox_emu": [
+    108873,
+    154057,
+    1234006,
+    261610
+   ],
+   "geometry": "rect",
+   "is_textbox": true,
+   "fill": {
+    "type": "solid",
+    "color": {
+     "hex": "#FFC000",
+     "theme_ref": "accent4"
+    }
+   },
+   "effects": [
+    {
+     "type": "outerShdw",
+     "blurRad_pt": 4.0,
+     "dist_pt": 3.0,
+     "dir_deg": 90.0,
+     "color": {
+      "hex": "#000000",
+      "theme_ref": "preset:black",
+      "modifiers": [
+       {
+        "alpha": 0.4
+       }
+      ],
+      "alpha": 0.4
+     }
+    }
+   ],
+   "text": {
+    "anchor": "ctr",
+    "wrap": "square",
+    "insets_in": {
+     "lIns": 0.1,
+     "tIns": 0.05,
+     "rIns": 0.1,
+     "bIns": 0.05
+    },
+    "autofit": "spAutoFit",
+    "paragraphs": [
+     {
+      "text": "Technique  ",
+      "align": "ctr",
+      "marL_in": 0.0,
+      "indent_in": 0.0,
+      "level": 0,
+      "bullet": null,
+      "lnSpc": {
+       "pct": 100.0
+      },
+      "spcBef": {
+       "pt": 15.0
+      },
+      "spcAft": {
+       "pt": 15.0
+      },
+      "runs": [
+       {
+        "text": "Technique ",
+        "size_pt": 11.0,
+        "bold": true,
+        "italic": false,
+        "font": "Roboto",
+        "color": {
+         "hex": "#000000",
+         "theme_ref": "preset:black"
+        }
+       },
+       {
+        "text": " ",
+        "size_pt": 11.0,
+        "bold": false,
+        "italic": false,
+        "font": "Roboto",
+        "color": {
+         "hex": "#000000",
+         "theme_ref": "preset:black"
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "13",
+   "name": "Text_variables",
+   "kind": "sp",
+   "bbox_in": {
+    "x": 1.618,
+    "y": 5.779,
+    "w": 4.899,
+    "h": 1.313,
+    "right": 6.518,
+    "bottom": 7.092
+   },
+   "bbox_emu": [
+    1479747,
+    5284474,
+    4480016,
+    1200329
+   ],
+   "geometry": "rect",
+   "text": {
+    "anchor": "t",
+    "wrap": "square",
+    "insets_in": {
+     "lIns": 0.1,
+     "tIns": 0.05,
+     "rIns": 0.1,
+     "bIns": 0.05
+    },
+    "autofit": "spAutoFit",
+    "paragraphs": [
+     {
+      "text": "Complexifiantes ",
+      "align": "l",
+      "marL_in": 0.0,
+      "indent_in": 0.0,
+      "level": 0,
+      "bullet": null,
+      "lnSpc": {
+       "pct": 100.0
+      },
+      "spcBef": {
+       "pt": 0.0
+      },
+      "spcAft": {
+       "pt": 0.0
+      },
+      "runs": [
+       {
+        "text": "Complexifiantes",
+        "size_pt": 12.0,
+        "bold": false,
+        "italic": false,
+        "font": "Calibri",
+        "color": {
+         "hex": "#000000",
+         "theme_ref": "preset:black"
+        }
+       },
+       {
+        "text": " ",
+        "size_pt": 12.0,
+        "bold": false,
+        "italic": false,
+        "font": "Calibri",
+        "color": {
+         "hex": "#000000",
+         "theme_ref": "preset:black"
+        }
+       }
+      ]
+     },
+     {
+      "text": "•limiter les touches ",
+      "align": "l",
+      "marL_in": 0.0,
+      "indent_in": 0.0,
+      "level": 0,
+      "bullet": null,
+      "lnSpc": {
+       "pct": 100.0
+      },
+      "spcBef": {
+       "pt": 0.0
+      },
+      "spcAft": {
+       "pt": 0.0
+      },
+      "runs": [
+       {
+        "text": "•limiter les touches ",
+        "size_pt": 12.0,
+        "bold": false,
+        "italic": false,
+        "font": "Calibri",
+        "color": {
+         "hex": "#000000",
+         "theme_ref": "preset:black"
+        }
+       }
+      ]
+     },
+     {
+      "text": "• réduire l’espace ",
+      "align": "l",
+      "marL_in": 0.0,
+      "indent_in": 0.0,
+      "level": 0,
+      "bullet": null,
+      "lnSpc": {
+       "pct": 100.0
+      },
+      "spcBef": {
+       "pt": 0.0
+      },
+      "spcAft": {
+       "pt": 0.0
+      },
+      "runs": [
+       {
+        "text": "• réduire l’espace ",
+        "size_pt": 12.0,
+        "bold": false,
+        "italic": false,
+        "font": "Calibri",
+        "color": {
+         "hex": "#000000",
+         "theme_ref": "preset:black"
+        }
+       }
+      ]
+     },
+     {
+      "text": "Simplifiantes ",
+      "align": "l",
+      "marL_in": 0.0,
+      "indent_in": 0.0,
+      "level": 0,
+      "bullet": null,
+      "lnSpc": {
+       "pct": 100.0
+      },
+      "spcBef": {
+       "pt": 0.0
+      },
+      "spcAft": {
+       "pt": 0.0
+      },
+      "runs": [
+       {
+        "text": "Simplifiantes",
+        "size_pt": 12.0,
+        "bold": false,
+        "italic": false,
+        "font": "Calibri",
+        "color": {
+         "hex": "#000000",
+         "theme_ref": "preset:black"
+        }
+       },
+       {
+        "text": " ",
+        "size_pt": 12.0,
+        "bold": false,
+        "italic": false,
+        "font": "Calibri",
+        "color": {
+         "hex": "#000000",
+         "theme_ref": "preset:black"
+        }
+       }
+      ]
+     },
+     {
+      "text": "• Agrandir le terrain",
+      "align": "l",
+      "marL_in": 0.0,
+      "indent_in": 0.0,
+      "level": 0,
+      "bullet": null,
+      "lnSpc": {
+       "pct": 100.0
+      },
+      "spcBef": {
+       "pt": 0.0
+      },
+      "spcAft": {
+       "pt": 0.0
+      },
+      "runs": [
+       {
+        "text": "• Agrandir le terrain",
+        "size_pt": 12.0,
+        "bold": false,
+        "italic": false,
+        "font": "Calibri",
+        "color": {
+         "hex": "#000000",
+         "theme_ref": "preset:black"
+        }
+       }
+      ]
+     },
+     {
+      "text": "• rajouter un joker au milieu  ",
+      "align": "l",
+      "marL_in": 0.0,
+      "indent_in": 0.0,
+      "level": 0,
+      "bullet": null,
+      "lnSpc": {
+       "pct": 100.0
+      },
+      "spcBef": {
+       "pt": 0.0
+      },
+      "spcAft": {
+       "pt": 0.0
+      },
+      "runs": [
+       {
+        "text": "• rajouter un joker au milieu  ",
+        "size_pt": 12.0,
+        "bold": false,
+        "italic": false,
+        "font": "Calibri",
+        "color": {
+         "hex": "#000000",
+         "theme_ref": "preset:black"
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "18",
+   "name": "Text_Comportements",
+   "kind": "sp",
+   "bbox_in": {
+    "x": 6.704,
+    "y": 5.869,
+    "w": 6.461,
+    "h": 1.111,
+    "right": 13.164,
+    "bottom": 6.98
+   },
+   "bbox_emu": [
+    6129739,
+    5366920,
+    5907764,
+    1015663
+   ],
+   "geometry": "rect",
+   "text": {
+    "anchor": "t",
+    "wrap": "square",
+    "insets_in": {
+     "lIns": 0.1,
+     "tIns": 0.05,
+     "rIns": 0.1,
+     "bIns": 0.05
+    },
+    "autofit": "spAutoFit",
+    "paragraphs": [
+     {
+      "text": "• Voir avant de recevoir grâce à la prise d'information.",
+      "align": "l",
+      "marL_in": 0.0,
+      "indent_in": 0.0,
+      "level": 0,
+      "bullet": null,
+      "lnSpc": {
+       "pct": 100.0
+      },
+      "spcBef": {
+       "pt": 0.0
+      },
+      "spcAft": {
+       "pt": 0.0
+      },
+      "runs": [
+       {
+        "text": "• Voir avant de recevoir grâce à la prise d'information.",
+        "size_pt": 12.0,
+        "bold": false,
+        "italic": false,
+        "font": "Calibri",
+        "color": {
+         "hex": "#000000",
+         "theme_ref": "preset:black"
+        }
+       }
+      ]
+     },
+     {
+      "text": "• Se placer de trois quarts pour jouer rapidement.",
+      "align": "l",
+      "marL_in": 0.0,
+      "indent_in": 0.0,
+      "level": 0,
+      "bullet": null,
+      "lnSpc": {
+       "pct": 100.0
+      },
+      "spcBef": {
+       "pt": 0.0
+      },
+      "spcAft": {
+       "pt": 0.0
+      },
+      "runs": [
+       {
+        "text": "• Se placer de trois quarts pour jouer rapidement.",
+        "size_pt": 12.0,
+        "bold": false,
+        "italic": false,
+        "font": "Calibri",
+        "color": {
+         "hex": "#000000",
+         "theme_ref": "preset:black"
+        }
+       }
+      ]
+     },
+     {
+      "text": "• Créer de la largeur et de la profondeur.",
+      "align": "l",
+      "marL_in": 0.0,
+      "indent_in": 0.0,
+      "level": 0,
+      "bullet": null,
+      "lnSpc": {
+       "pct": 100.0
+      },
+      "spcBef": {
+       "pt": 0.0
+      },
+      "spcAft": {
+       "pt": 0.0
+      },
+      "runs": [
+       {
+        "text": "• Créer de la largeur et de la profondeur.",
+        "size_pt": 12.0,
+        "bold": false,
+        "italic": false,
+        "font": "Calibri",
+        "color": {
+         "hex": "#000000",
+         "theme_ref": "preset:black"
+        }
+       }
+      ]
+     },
+     {
+      "text": "• Ne pas se rapprocher systématiquement du porteur.",
+      "align": "l",
+      "marL_in": 0.0,
+      "indent_in": 0.0,
+      "level": 0,
+      "bullet": null,
+      "lnSpc": {
+       "pct": 100.0
+      },
+      "spcBef": {
+       "pt": 0.0
+      },
+      "spcAft": {
+       "pt": 0.0
+      },
+      "runs": [
+       {
+        "text": "• Ne pas se rapprocher systématiquement du porteur.",
+        "size_pt": 12.0,
+        "bold": false,
+        "italic": false,
+        "font": "Calibri",
+        "color": {
+         "hex": "#000000",
+         "theme_ref": "preset:black"
+        }
+       }
+      ]
+     },
+     {
+      "text": "• Fixer un défenseur avant de transmettre",
+      "align": "l",
+      "marL_in": 0.0,
+      "indent_in": 0.0,
+      "level": 0,
+      "bullet": null,
+      "lnSpc": {
+       "pct": 100.0
+      },
+      "spcBef": {
+       "pt": 0.0
+      },
+      "spcAft": {
+       "pt": 0.0
+      },
+      "runs": [
+       {
+        "text": "• Fixer un défenseur avant de transmettre",
+        "size_pt": 12.0,
+        "bold": false,
+        "italic": false,
+        "font": "Calibri",
+        "color": {
+         "hex": "#000000",
+         "theme_ref": "preset:black"
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "44",
+   "name": "Logo SFL",
+   "kind": "pic",
+   "bbox_in": {
+    "x": 0.144,
+    "y": 5.54,
+    "w": 1.312,
+    "h": 1.552,
+    "right": 1.456,
+    "bottom": 7.092
+   },
+   "bbox_emu": [
+    131772,
+    5065813,
+    1199659,
+    1418990
+   ],
+   "geometry": "rect",
+   "image": {
+    "target": "../media/image2.png"
+   }
+  },
+  {
+   "id": "14",
+   "name": "Schema",
+   "kind": "pic",
+   "bbox_in": {
+    "x": 8.189,
+    "y": 0.693,
+    "w": 4.946,
+    "h": 2.459,
+    "right": 13.134,
+    "bottom": 3.152
+   },
+   "bbox_emu": [
+    7487831,
+    633540,
+    4522277,
+    2248767
+   ],
+   "geometry": "rect",
+   "image": {
+    "target": "../media/image3.png"
+   }
+  }
+ ]
+}

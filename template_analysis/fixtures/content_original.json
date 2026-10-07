@@ -1,0 +1,54 @@
+{
+  "category": "Technique",
+  "moment": "Echauffement",
+  "title": "Créer et utiliser les espaces",
+  "space": [
+    "**Surface** : ",
+    "12x12",
+    "3 carrés"
+  ],
+  "teams": {
+    "black": "x joueurs",
+    "red": 6,
+    "blue": 6,
+    "yellow": 6
+  },
+  "duration": [
+    "Le temps total 15 minutes",
+    "6 séquences de 2 minutes"
+  ],
+  "goal": [
+    "En conservation",
+    "10 passes = 1pt",
+    "Défenseur",
+    "intercepter = 1 pt"
+  ],
+  "rules": [
+    "4vs2",
+    "jeu au sol obligatoire",
+    "occuper tous les espaces du carré",
+    "les joueurs sont situés à l’extérieur du carré",
+    "Thème 1 jeu libre",
+    "Thème 2 max 2 touches",
+    "Thème 3 après chaque passe changer de coté"
+  ],
+  "variables": {
+    "Complexifiantes": [
+      "limiter les touches",
+      "réduire l’espace"
+    ],
+    "Simplifiantes": [
+      "Agrandir le terrain",
+      "rajouter un joker au milieu"
+    ]
+  },
+  "behaviours": [
+    "Voir avant de recevoir grâce à la prise d'information.",
+    "Se placer de trois quarts pour jouer rapidement.",
+    "Créer de la largeur et de la profondeur.",
+    "Ne pas se rapprocher systématiquement du porteur.",
+    "Fixer un défenseur avant de transmettre"
+  ],
+  "diagram": "schema_template.png",
+  "diagram_alt": "Trois carrés 12x12, 4 contre 2"
+}
