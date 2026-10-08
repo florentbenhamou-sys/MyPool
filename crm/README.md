@@ -20,7 +20,36 @@ Les choix d'architecture, le modèle de données et les ambiguïtés tranchées 
 
 ## 1. Démarrage rapide avec Docker (recommandé)
 
-Pré-requis : Docker Desktop (ou Docker Engine + plugin compose).
+Pré-requis : Docker Desktop (ou Docker Engine + plugin compose), démarré.
+
+### Avec le script de démarrage
+
+| Système | Commande (depuis le dossier `crm/`) |
+|---|---|
+| macOS / Linux | `./start.sh` |
+| Windows | double-cliquer sur `start.cmd` (ou `start.cmd` dans un terminal) |
+
+Le script :
+
+1. vérifie que Docker est lancé ;
+2. au premier lancement, crée `.env` à partir de `.env.example` avec un **mot de passe PostgreSQL aléatoire** ;
+3. construit et démarre PostgreSQL, applique les migrations, démarre l'application
+   (relancer le script après un `git pull` suffit pour mettre à jour) ;
+4. installe les référentiels (tags, cibles de démo, vecteurs de contact) sans écraser vos modifications ;
+5. attend que l'application réponde, affiche l'adresse à utiliser depuis un téléphone et ouvre le navigateur.
+
+Autres commandes (`./start.sh <commande>` ou `start.cmd <commande>`) :
+
+| Commande | Rôle |
+|---|---|
+| `stop` | arrête l'application (données conservées) |
+| `restart` | redémarre l'application |
+| `status` | état des conteneurs |
+| `logs` | journaux de l'application |
+| `demo` | ajoute les données de démonstration (uniquement si la base est vide) |
+| `backup` | sauvegarde la base et les pièces jointes dans `backups/` |
+
+### Manuellement
 
 ```bash
 cd crm
@@ -89,7 +118,9 @@ que si aucune entité n'existe).
 
 ## 4. Sauvegarde et restauration PostgreSQL
 
-Sauvegarde au format « custom » (compressé, restauration sélective possible) :
+Le plus simple : `./start.sh backup` (Windows : `start.cmd backup`), qui produit dans `backups/`
+un dump de la base et une archive des pièces jointes. Équivalent manuel, au format « custom »
+(compressé, restauration sélective possible) :
 
 ```bash
 mkdir -p backups
