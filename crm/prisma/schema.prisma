@@ -1,0 +1,567 @@
+// =============================================================================
+// Schéma de données — CRM / Avant-vente / Propositions commerciales
+//
+// Principes (voir docs/ARCHITECTURE.md) :
+//  * Identifiants UUID partout (fusion de bases / multi-instances possible).
+//  * Montants en DECIMAL (jamais de float). Remises = POURCENTAGE (0..100).
+//  * CATALOGUE ≠ PROPOSITION : chaque ligne de proposition contient un snapshot
+//    (code, libellé, prix catalogue) figé au moment de l'ajout.
+//  * createdById / updatedById : colonnes d'audit sans clé étrangère, afin
+//    qu'elles survivent à un utilisateur désactivé (les users ne sont jamais
+//    supprimés). Elles restent NULL tant que l'authentification n'existe pas.
+//  * Dates « jour » en DATE, dates + heures en TIMESTAMPTZ.
+// =============================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// -----------------------------------------------------------------------------
+// Utilisateurs & audit
+// -----------------------------------------------------------------------------
+
+model User {
+  id        String   @id @default(uuid()) @db.Uuid
+  email     String   @unique
+  name      String
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+
+  auditLogs AuditLog[]
+}
+
+/// Journal d'audit (préparé pour la V2 : historique des modifications).
+model AuditLog {
+  id         String   @id @default(uuid()) @db.Uuid
+  userId     String?  @db.Uuid
+  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  /// Nom du modèle concerné (ex. "Proposal")
+  objectType String
+  objectId   String   @db.Uuid
+  /// CREATE | UPDATE | DELETE | ARCHIVE | ...
+  action     String
+  /// { champ: { from, to } } ou instantané libre
+  changes    Json?
+  createdAt  DateTime @default(now()) @db.Timestamptz(3)
+
+  @@index([objectType, objectId])
+  @@index([createdAt])
+}
+
+// -----------------------------------------------------------------------------
+// Référentiels (administrables)
+// -----------------------------------------------------------------------------
+
+/// Statut d'une entité. Ajouter un statut = ajouter une valeur ici + une migration
+/// + un libellé dans src/lib/i18n.
+enum EntityStatus {
+  PROSPECT
+  CLIENT
+}
+
+enum MeetingType {
+  MEETING
+  PRESENTATION
+}
+
+enum RfpRfiType {
+  RFP
+  RFI
+}
+
+enum ProposalStatus {
+  DRAFT
+  IN_PREPARATION
+  SENT
+  NEGOTIATION
+  ACCEPTED
+  REJECTED
+  EXPIRED
+}
+
+model Tag {
+  id       String  @id @default(uuid()) @db.Uuid
+  code     String  @unique
+  label    String
+  /// Catégorie libre (ENVIRONMENT, TARGET, ...) pour regrouper les tags dans l'UI.
+  category String
+  active   Boolean @default(true)
+  order    Int     @default(0)
+
+  entities EntityTag[]
+  meetings MeetingTag[]
+  demos    DemoTag[]
+
+  @@index([category])
+}
+
+model ContactChannelType {
+  id     String  @id @default(uuid()) @db.Uuid
+  code   String  @unique
+  label  String
+  active Boolean @default(true)
+  order  Int     @default(0)
+
+  channels ContactChannel[]
+}
+
+model DemoTarget {
+  id     String  @id @default(uuid()) @db.Uuid
+  code   String  @unique
+  label  String
+  active Boolean @default(true)
+  order  Int     @default(0)
+
+  demos    DemoDemoTarget[]
+  meetings Meeting[]
+}
+
+// -----------------------------------------------------------------------------
+// CRM / Avant-vente
+// -----------------------------------------------------------------------------
+
+model Entity {
+  id                    String       @id @default(uuid()) @db.Uuid
+  name                  String
+  status                EntityStatus @default(PROSPECT)
+  /// Code langue ISO 639-1 (fr, en, de, ...)
+  communicationLanguage String?
+  website               String?
+  addressLine1          String?
+  addressLine2          String?
+  postalCode            String?
+  city                  String?
+  country               String?
+  notes                 String?
+  /// Archivage logique (une entité ayant des propositions n'est jamais supprimée)
+  archivedAt            DateTime?    @db.Timestamptz(3)
+  createdById           String?      @db.Uuid
+  updatedById           String?      @db.Uuid
+  createdAt             DateTime     @default(now()) @db.Timestamptz(3)
+  updatedAt             DateTime     @updatedAt @db.Timestamptz(3)
+
+  contacts        Contact[]
+  contactChannels ContactChannel[]
+  meetings        Meeting[]
+  demos           Demo[]
+  rfpRfis         RfpRfi[]
+  proposals       Proposal[]
+  tags            EntityTag[]
+
+  @@index([name])
+  @@index([status])
+}
+
+model EntityTag {
+  entityId String @db.Uuid
+  tagId    String @db.Uuid
+  entity   Entity @relation(fields: [entityId], references: [id], onDelete: Cascade)
+  tag      Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([entityId, tagId])
+  @@index([tagId])
+}
+
+model Contact {
+  id          String   @id @default(uuid()) @db.Uuid
+  entityId    String   @db.Uuid
+  entity      Entity   @relation(fields: [entityId], references: [id], onDelete: Cascade)
+  firstName   String
+  lastName    String
+  email       String
+  phone       String?
+  role        String?
+  notes       String?
+  active      Boolean  @default(true)
+  createdById String?  @db.Uuid
+  updatedById String?  @db.Uuid
+  createdAt   DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime @updatedAt @db.Timestamptz(3)
+
+  channels ContactChannel[]
+  meetings MeetingContact[]
+
+  @@index([entityId])
+  @@index([email])
+  @@index([lastName])
+}
+
+/// Vecteur de prise de contact (comment l'entité / le contact a été obtenu).
+model ContactChannel {
+  id          String             @id @default(uuid()) @db.Uuid
+  entityId    String             @db.Uuid
+  entity      Entity             @relation(fields: [entityId], references: [id], onDelete: Cascade)
+  typeId      String             @db.Uuid
+  type        ContactChannelType @relation(fields: [typeId], references: [id], onDelete: Restrict)
+  contactId   String?            @db.Uuid
+  contact     Contact?           @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  eventName   String?
+  contactDate DateTime           @db.Date
+  notes       String?
+  createdById String?            @db.Uuid
+  updatedById String?            @db.Uuid
+  createdAt   DateTime           @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime           @updatedAt @db.Timestamptz(3)
+
+  @@index([entityId])
+  @@index([contactDate])
+}
+
+model Meeting {
+  id           String      @id @default(uuid()) @db.Uuid
+  entityId     String      @db.Uuid
+  entity       Entity      @relation(fields: [entityId], references: [id], onDelete: Cascade)
+  type         MeetingType @default(MEETING)
+  /// Numéro d'ordre par entité (Meeting #1, #2...). Attribué à la création, jamais renuméroté.
+  counter      Int
+  title        String
+  meetingDate  DateTime    @db.Timestamptz(3)
+  demoTargetId String?     @db.Uuid
+  demoTarget   DemoTarget? @relation(fields: [demoTargetId], references: [id], onDelete: SetNull)
+  notes        String?
+  transcript   String?
+  nextSteps    String?
+  createdById  String?     @db.Uuid
+  updatedById  String?     @db.Uuid
+  createdAt    DateTime    @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime    @updatedAt @db.Timestamptz(3)
+
+  contacts MeetingContact[]
+  tags     MeetingTag[]
+  demos    Demo[]
+
+  @@unique([entityId, counter])
+  @@index([meetingDate])
+}
+
+model MeetingContact {
+  meetingId String  @db.Uuid
+  contactId String  @db.Uuid
+  meeting   Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  contact   Contact @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@id([meetingId, contactId])
+  @@index([contactId])
+}
+
+model MeetingTag {
+  meetingId String  @db.Uuid
+  tagId     String  @db.Uuid
+  meeting   Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  tag       Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([meetingId, tagId])
+  @@index([tagId])
+}
+
+model Demo {
+  id          String   @id @default(uuid()) @db.Uuid
+  entityId    String   @db.Uuid
+  entity      Entity   @relation(fields: [entityId], references: [id], onDelete: Cascade)
+  meetingId   String?  @db.Uuid
+  meeting     Meeting? @relation(fields: [meetingId], references: [id], onDelete: SetNull)
+  /// Numéro d'ordre par entité (Demo #1, #2...).
+  counter     Int
+  title       String
+  demoDate    DateTime @db.Timestamptz(3)
+  notes       String?
+  transcript  String?
+  nextSteps   String?
+  createdById String?  @db.Uuid
+  updatedById String?  @db.Uuid
+  createdAt   DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime @updatedAt @db.Timestamptz(3)
+
+  targets DemoDemoTarget[]
+  tags    DemoTag[]
+
+  @@unique([entityId, counter])
+  @@index([demoDate])
+}
+
+model DemoDemoTarget {
+  demoId       String     @db.Uuid
+  demoTargetId String     @db.Uuid
+  demo         Demo       @relation(fields: [demoId], references: [id], onDelete: Cascade)
+  demoTarget   DemoTarget @relation(fields: [demoTargetId], references: [id], onDelete: Cascade)
+
+  @@id([demoId, demoTargetId])
+  @@index([demoTargetId])
+}
+
+model DemoTag {
+  demoId String @db.Uuid
+  tagId  String @db.Uuid
+  demo   Demo   @relation(fields: [demoId], references: [id], onDelete: Cascade)
+  tag    Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([demoId, tagId])
+  @@index([tagId])
+}
+
+model RfpRfi {
+  id               String     @id @default(uuid()) @db.Uuid
+  entityId         String     @db.Uuid
+  entity           Entity     @relation(fields: [entityId], references: [id], onDelete: Cascade)
+  type             RfpRfiType
+  /// Numéro d'ordre par entité, tous types confondus.
+  counter          Int
+  title            String
+  contactDate      DateTime   @db.Date
+  responseDate     DateTime?  @db.Date
+  /// Date de soutenance (présentation orale de la réponse)
+  presentationDate DateTime?  @db.Date
+  notes            String?
+  createdById      String?    @db.Uuid
+  updatedById      String?    @db.Uuid
+  createdAt        DateTime   @default(now()) @db.Timestamptz(3)
+  updatedAt        DateTime   @updatedAt @db.Timestamptz(3)
+
+  files     RfpRfiFile[]
+  proposals Proposal[]
+
+  @@unique([entityId, counter])
+  @@index([responseDate])
+}
+
+/// Métadonnées d'un fichier. Le contenu est dans le stockage (src/server/storage),
+/// jamais dans PostgreSQL.
+model RfpRfiFile {
+  id          String   @id @default(uuid()) @db.Uuid
+  rfpRfiId    String   @db.Uuid
+  rfpRfi      RfpRfi   @relation(fields: [rfpRfiId], references: [id], onDelete: Cascade)
+  fileName    String
+  storageKey  String   @unique
+  mimeType    String
+  sizeBytes   Int
+  createdById String?  @db.Uuid
+  createdAt   DateTime @default(now()) @db.Timestamptz(3)
+
+  @@index([rfpRfiId])
+}
+
+// -----------------------------------------------------------------------------
+// Catalogue (valeurs ACTUELLES — ne jamais lire ces prix pour une proposition existante)
+// -----------------------------------------------------------------------------
+
+model Product {
+  id          String   @id @default(uuid()) @db.Uuid
+  code        String   @unique
+  name        String
+  description String?
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime @updatedAt @db.Timestamptz(3)
+
+  proposalProducts ProposalProduct[]
+}
+
+/// Souscription — prix ANNUEL.
+model Subscription {
+  id              String   @id @default(uuid()) @db.Uuid
+  code            String   @unique
+  description     String
+  listPriceAnnual Decimal  @db.Decimal(14, 2)
+  currency        String   @default("EUR") @db.Char(3)
+  active          Boolean  @default(true)
+  createdAt       DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt       DateTime @updatedAt @db.Timestamptz(3)
+
+  scenarioLines ScenarioSubscription[]
+}
+
+/// Service — prix ONE SHOT.
+model Service {
+  id          String   @id @default(uuid()) @db.Uuid
+  code        String   @unique
+  description String
+  listPrice   Decimal  @db.Decimal(14, 2)
+  currency    String   @default("EUR") @db.Char(3)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime @updatedAt @db.Timestamptz(3)
+
+  scenarioLines ScenarioService[]
+}
+
+/// Maintenance — prix ONE SHOT.
+model Maintenance {
+  id          String   @id @default(uuid()) @db.Uuid
+  code        String   @unique
+  description String
+  listPrice   Decimal  @db.Decimal(14, 2)
+  currency    String   @default("EUR") @db.Char(3)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime @updatedAt @db.Timestamptz(3)
+
+  scenarioLines ScenarioMaintenance[]
+}
+
+// -----------------------------------------------------------------------------
+// Propositions (valeurs FIGÉES au moment de l'ajout)
+// -----------------------------------------------------------------------------
+
+model Proposal {
+  id               String         @id @default(uuid()) @db.Uuid
+  entityId         String         @db.Uuid
+  /// Restrict : une entité ayant des propositions ne peut pas être supprimée.
+  entity           Entity         @relation(fields: [entityId], references: [id], onDelete: Restrict)
+  /// Numéro lisible, unique (ex. P-2026-0001)
+  number           String         @unique
+  creationDate     DateTime       @db.Date
+  validityDate     DateTime?      @db.Date
+  /// Durée du contrat en MOIS
+  contractDuration Int?
+  status           ProposalStatus @default(DRAFT)
+  /// Devise ISO 4217 de toute la proposition
+  currency         String         @default("EUR") @db.Char(3)
+  notes            String?
+  rfpRfiId         String?        @db.Uuid
+  rfpRfi           RfpRfi?        @relation(fields: [rfpRfiId], references: [id], onDelete: SetNull)
+  /// Archivage logique (pas de suppression physique d'une proposition)
+  archivedAt       DateTime?      @db.Timestamptz(3)
+  createdById      String?        @db.Uuid
+  updatedById      String?        @db.Uuid
+  createdAt        DateTime       @default(now()) @db.Timestamptz(3)
+  updatedAt        DateTime       @updatedAt @db.Timestamptz(3)
+
+  products ProposalProduct[]
+
+  @@index([entityId])
+  @@index([status])
+  @@index([validityDate])
+}
+
+model ProposalProduct {
+  id                         String   @id @default(uuid()) @db.Uuid
+  proposalId                 String   @db.Uuid
+  proposal                   Proposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  /// Restrict : un produit utilisé dans une proposition ne peut être que désactivé.
+  productId                  String   @db.Uuid
+  product                    Product  @relation(fields: [productId], references: [id], onDelete: Restrict)
+  displayNameSnapshot        String
+  displayDescriptionSnapshot String?
+  order                      Int      @default(0)
+  notes                      String?
+
+  scenarios Scenario[]
+
+  @@index([proposalId])
+  @@index([productId])
+}
+
+/// Configuration commerciale ALTERNATIVE d'un produit (jamais additionnée aux autres).
+model Scenario {
+  id                     String          @id @default(uuid()) @db.Uuid
+  proposalProductId      String          @db.Uuid
+  proposalProduct        ProposalProduct @relation(fields: [proposalProductId], references: [id], onDelete: Cascade)
+  name                   String
+  description            String?
+  order                  Int             @default(0)
+  /// Clé de la combinaison retenue (calculée par generateScenarioCombinations), optionnelle.
+  selectedCombinationKey String?
+  createdAt              DateTime        @default(now()) @db.Timestamptz(3)
+  updatedAt              DateTime        @updatedAt @db.Timestamptz(3)
+
+  subscriptions     ScenarioSubscription[]
+  services          ScenarioService[]
+  maintenances      ScenarioMaintenance[]
+  additionalOptions ScenarioOption[]
+
+  @@index([proposalProductId])
+}
+
+/// Souscription dans un scénario — prix ANNUEL.
+/// customerPrice = listPrice × (1 − discount / 100), stocké (état commercial historique).
+model ScenarioSubscription {
+  id                  String        @id @default(uuid()) @db.Uuid
+  scenarioId          String        @db.Uuid
+  scenario            Scenario      @relation(fields: [scenarioId], references: [id], onDelete: Cascade)
+  subscriptionId      String?       @db.Uuid
+  subscription        Subscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+  codeSnapshot        String
+  descriptionSnapshot String
+  listPrice           Decimal       @db.Decimal(14, 2)
+  /// Remise en POURCENTAGE (20 = 20 %)
+  discount            Decimal       @default(0) @db.Decimal(5, 2)
+  customerPrice       Decimal       @db.Decimal(14, 2)
+  displayDiscount     Boolean       @default(true)
+  order               Int           @default(0)
+
+  @@index([scenarioId])
+}
+
+/// Service dans un scénario — prix ONE SHOT.
+model ScenarioService {
+  id                  String   @id @default(uuid()) @db.Uuid
+  scenarioId          String   @db.Uuid
+  scenario            Scenario @relation(fields: [scenarioId], references: [id], onDelete: Cascade)
+  serviceId           String?  @db.Uuid
+  service             Service? @relation(fields: [serviceId], references: [id], onDelete: SetNull)
+  codeSnapshot        String
+  descriptionSnapshot String
+  listPrice           Decimal  @db.Decimal(14, 2)
+  discount            Decimal  @default(0) @db.Decimal(5, 2)
+  customerPrice       Decimal  @db.Decimal(14, 2)
+  displayDiscount     Boolean  @default(true)
+  order               Int      @default(0)
+
+  options ScenarioServiceOption[]
+
+  @@index([scenarioId])
+}
+
+/// Option rattachée à un service précis d'un scénario — prix ONE SHOT.
+model ScenarioServiceOption {
+  id                String          @id @default(uuid()) @db.Uuid
+  scenarioServiceId String          @db.Uuid
+  scenarioService   ScenarioService @relation(fields: [scenarioServiceId], references: [id], onDelete: Cascade)
+  description       String
+  listPrice         Decimal         @db.Decimal(14, 2)
+  discount          Decimal         @default(0) @db.Decimal(5, 2)
+  customerPrice     Decimal         @db.Decimal(14, 2)
+  displayDiscount   Boolean         @default(true)
+  order             Int             @default(0)
+
+  @@index([scenarioServiceId])
+}
+
+/// Maintenance dans un scénario — prix ONE SHOT.
+model ScenarioMaintenance {
+  id                  String       @id @default(uuid()) @db.Uuid
+  scenarioId          String       @db.Uuid
+  scenario            Scenario     @relation(fields: [scenarioId], references: [id], onDelete: Cascade)
+  maintenanceId       String?      @db.Uuid
+  maintenance         Maintenance? @relation(fields: [maintenanceId], references: [id], onDelete: SetNull)
+  codeSnapshot        String
+  descriptionSnapshot String
+  listPrice           Decimal      @db.Decimal(14, 2)
+  discount            Decimal      @default(0) @db.Decimal(5, 2)
+  customerPrice       Decimal      @db.Decimal(14, 2)
+  displayDiscount     Boolean      @default(true)
+  order               Int          @default(0)
+
+  @@index([scenarioId])
+}
+
+/// Option additionnelle libre d'un scénario — prix ONE SHOT.
+model ScenarioOption {
+  id              String   @id @default(uuid()) @db.Uuid
+  scenarioId      String   @db.Uuid
+  scenario        Scenario @relation(fields: [scenarioId], references: [id], onDelete: Cascade)
+  description     String
+  listPrice       Decimal  @db.Decimal(14, 2)
+  discount        Decimal  @default(0) @db.Decimal(5, 2)
+  customerPrice   Decimal  @db.Decimal(14, 2)
+  displayDiscount Boolean  @default(true)
+  order           Int      @default(0)
+
+  @@index([scenarioId])
+}
