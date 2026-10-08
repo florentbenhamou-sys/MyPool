@@ -22,6 +22,36 @@ Les choix d'architecture, le modèle de données et les ambiguïtés tranchées 
 
 Pré-requis : Docker Desktop (ou Docker Engine + plugin compose), démarré.
 
+### Vérifier Docker (et l'installer si besoin)
+
+Vérification rapide :
+
+| Système | Commande |
+|---|---|
+| macOS / Linux | `./start.sh check` |
+| Windows | `start.cmd check` |
+
+Ou à la main, dans un terminal : `docker --version` (installé ?), `docker info` (démarré ?),
+`docker compose version` (plugin compose présent ?).
+
+Le script de démarrage s'en charge aussi :
+- **Docker absent** → il propose de l'installer, après confirmation :
+  - Windows : `winget install --exact --id Docker.DockerDesktop` ;
+  - macOS : `brew install --cask docker` (sinon ouverture de la page de téléchargement) ;
+  - Linux : script officiel `curl -fsSL https://get.docker.com | sudo sh`.
+- **Docker installé mais arrêté** → il lance Docker Desktop (ou `systemctl start docker`) et attend qu'il soit prêt.
+
+Installation manuelle :
+
+| Système | Procédure |
+|---|---|
+| Windows 10/11 | Télécharger **Docker Desktop** sur https://www.docker.com/products/docker-desktop/, installer en laissant l'option **WSL 2** cochée, **redémarrer** Windows, lancer Docker Desktop et accepter les conditions. Si WSL manque : `wsl --install` dans un PowerShell administrateur, puis redémarrer. |
+| macOS | Télécharger **Docker Desktop** (choisir *Apple Silicon* ou *Intel* selon le Mac : menu  → À propos de ce Mac), glisser dans Applications, lancer une fois et accepter les conditions. |
+| Linux | Suivre https://docs.docker.com/engine/install/ (ou le script `get.docker.com`), puis `sudo usermod -aG docker $USER` et se reconnecter. |
+
+Après l'installation, ouvrir **un nouveau terminal** (pour que la commande `docker` soit trouvée)
+et relancer le script de démarrage.
+
 ### Avec le script de démarrage
 
 | Système | Commande (depuis le dossier `crm/`) |
@@ -31,7 +61,7 @@ Pré-requis : Docker Desktop (ou Docker Engine + plugin compose), démarré.
 
 Le script :
 
-1. vérifie que Docker est lancé ;
+1. vérifie Docker (propose de l'installer s'il est absent, le démarre s'il est arrêté) ;
 2. au premier lancement, crée `.env` à partir de `.env.example` avec un **mot de passe PostgreSQL aléatoire** ;
 3. construit et démarre PostgreSQL, applique les migrations, démarre l'application
    (relancer le script après un `git pull` suffit pour mettre à jour) ;
@@ -48,6 +78,7 @@ Autres commandes (`./start.sh <commande>` ou `start.cmd <commande>`) :
 | `logs` | journaux de l'application |
 | `demo` | ajoute les données de démonstration (uniquement si la base est vide) |
 | `backup` | sauvegarde la base et les pièces jointes dans `backups/` |
+| `check` | vérifie seulement que Docker est installé et démarré |
 
 ### Manuellement
 

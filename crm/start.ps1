@@ -8,7 +8,10 @@
 #   start.cmd logs       journaux de l'application (Ctrl+C pour quitter)
 #   start.cmd demo       ajoute les données de DÉMONSTRATION (seulement si la base est vide)
 #   start.cmd backup     sauvegarde la base + les pièces jointes dans .\backups
+#   start.cmd check      vérifie seulement que Docker est installé et démarré
 #
+#  Si Docker est absent, le script propose de l'installer (winget) ;
+#  s'il est arrêté, il lance Docker Desktop et attend qu'il soit prêt.
 #  Au premier lancement, le fichier .env est créé à partir de .env.example
 #  avec un mot de passe PostgreSQL aléatoire.
 # =============================================================================
@@ -33,12 +36,68 @@ function Get-EnvValue($Name) {
   return $null
 }
 
+$DockerDesktopExe = Join-Path $env:ProgramFiles "Docker\Docker\Docker Desktop.exe"
+
+function Confirm-Choice($Question) {
+  $answer = Read-Host "$Question [o/N]"
+  return $answer -match '^[oOyY]'
+}
+
+function Install-Docker {
+  if (Get-Command winget -ErrorAction SilentlyContinue) {
+    if (-not (Confirm-Choice "Installer Docker Desktop avec winget (droits administrateur demandés) ?")) {
+      Fail "Installation annulée. Téléchargement manuel : https://www.docker.com/products/docker-desktop/"
+    }
+    winget install --exact --id Docker.DockerDesktop --accept-package-agreements --accept-source-agreements
+    if ($LASTEXITCODE -ne 0) { Fail "L'installation par winget a échoué. Téléchargement manuel : https://www.docker.com/products/docker-desktop/" }
+    Ok "Docker Desktop est installé."
+    Write-Host ""
+    Write-Host "Étapes suivantes :" -ForegroundColor Yellow
+    Write-Host "  1. Redémarrez Windows si l'installateur le demande (activation de WSL 2)."
+    Write-Host "  2. Lancez Docker Desktop une première fois et acceptez les conditions."
+    Write-Host "  3. Relancez start.cmd."
+    exit 0
+  }
+  Info "winget indisponible : ouverture de la page de téléchargement de Docker Desktop."
+  Start-Process "https://www.docker.com/products/docker-desktop/"
+  Fail "Installez Docker Desktop, lancez-le une fois, puis relancez start.cmd."
+}
+
+function Test-DockerRunning {
+  docker info *> $null
+  return ($LASTEXITCODE -eq 0)
+}
+
+# Vérifie Docker ; propose de l'installer s'il est absent, le démarre s'il est arrêté.
 function Test-Docker {
   if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
-    Fail "Docker n'est pas installé : https://docs.docker.com/desktop/setup/install/windows-install/"
+    if (Test-Path $DockerDesktopExe) {
+      Fail "Docker Desktop est installé mais la commande 'docker' est introuvable : fermez ce terminal (ou redémarrez Windows) puis relancez start.cmd."
+    }
+    Info "Docker n'est pas installé sur cette machine."
+    Install-Docker
   }
-  docker info *> $null
-  if ($LASTEXITCODE -ne 0) { Fail "Docker ne répond pas : lancez Docker Desktop puis réessayez." }
+  if (-not (Test-DockerRunning)) {
+    if (-not (Test-Path $DockerDesktopExe)) { Fail "Docker ne répond pas : lancez Docker Desktop puis réessayez." }
+    Info "Docker Desktop n'est pas démarré : lancement..."
+    Start-Process $DockerDesktopExe
+    Info "Attente de Docker (jusqu'à 3 minutes)..."
+    for ($i = 0; $i -lt 90 -and -not (Test-DockerRunning); $i++) { Start-Sleep -Seconds 2 }
+    if (-not (Test-DockerRunning)) { Fail "Docker ne répond pas : vérifiez la fenêtre Docker Desktop puis relancez start.cmd." }
+  }
+  docker compose version *> $null
+  if ($LASTEXITCODE -ne 0) { Fail "Le plugin 'docker compose' est introuvable : mettez Docker Desktop à jour." }
+}
+
+# Diagnostic seul (aucune action).
+function Show-DockerCheck {
+  if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
+    Write-Host "X Docker n'est pas installé (start.cmd proposera de l'installer)" -ForegroundColor Red; exit 1
+  }
+  Ok "Docker installé : $(docker --version)"
+  if (Test-DockerRunning) { Ok "Docker est démarré" } else { Write-Host "X Docker est installé mais pas démarré" -ForegroundColor Red }
+  docker compose version *> $null
+  if ($LASTEXITCODE -eq 0) { Ok "$(docker compose version)" } else { Write-Host "X Plugin docker compose absent" -ForegroundColor Red }
 }
 
 function New-EnvFile {
@@ -118,5 +177,6 @@ switch ($Command.ToLower()) {
   "logs" { Test-Docker; docker compose logs -f app }
   "demo" { Test-Docker; New-EnvFile; Invoke-Seed "true"; Ok "Données de démonstration ajoutées (si la base était vide)." }
   "backup" { Backup-App }
-  default { Fail "Commande inconnue : $Command (start, stop, restart, status, logs, demo, backup)" }
+  "check" { Show-DockerCheck }
+  default { Fail "Commande inconnue : $Command (start, stop, restart, status, logs, demo, backup, check)" }
 }

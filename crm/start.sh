@@ -9,7 +9,10 @@
 #   ./start.sh logs       journaux de l'application (Ctrl+C pour quitter)
 #   ./start.sh demo       ajoute les données de DÉMONSTRATION (seulement si la base est vide)
 #   ./start.sh backup     sauvegarde la base + les pièces jointes dans ./backups
+#   ./start.sh check      vérifie seulement que Docker est installé et démarré
 #
+#  Si Docker est absent, le script propose de l'installer (Homebrew sur macOS,
+#  script officiel get.docker.com sur Linux) ; s'il est arrêté, il le démarre.
 #  Au premier lancement, le fichier .env est créé à partir de .env.example
 #  avec un mot de passe PostgreSQL aléatoire.
 # =============================================================================
@@ -28,10 +31,94 @@ env_value() { # lit une variable du fichier .env (sans guillemets)
   grep -E "^$1=" .env 2>/dev/null | tail -1 | cut -d= -f2- | sed -e 's/^"//' -e 's/"$//'
 }
 
+confirm() { # $1 = question ; renvoie 0 si l'utilisateur répond oui
+  local answer
+  read -r -p "$1 [o/N] " answer || return 1
+  [[ "$answer" =~ ^[oOyY] ]]
+}
+
+install_docker() {
+  case "$(uname)" in
+    Darwin)
+      if command -v brew >/dev/null 2>&1; then
+        confirm "Installer Docker Desktop avec Homebrew (brew install --cask docker) ?" ||
+          fail "Installation annulée. Téléchargement manuel : https://www.docker.com/products/docker-desktop/"
+        brew install --cask docker
+        ok "Docker Desktop installé. Premier démarrage (acceptez les conditions dans la fenêtre Docker)…"
+        open -a Docker
+      else
+        info "Homebrew absent : ouverture de la page de téléchargement de Docker Desktop."
+        open "https://www.docker.com/products/docker-desktop/" 2>/dev/null || true
+        fail "Installez Docker Desktop (Apple Silicon ou Intel), lancez-le une fois, puis relancez ./start.sh"
+      fi
+      ;;
+    Linux)
+      confirm "Installer Docker Engine avec le script officiel (https://get.docker.com, droits sudo requis) ?" ||
+        fail "Installation annulée. Procédure manuelle : https://docs.docker.com/engine/install/"
+      curl -fsSL https://get.docker.com | sudo sh
+      sudo systemctl enable --now docker
+      sudo usermod -aG docker "$USER"
+      ok "Docker installé. Fermez votre session puis reconnectez-vous (groupe 'docker'), puis relancez ./start.sh"
+      exit 0
+      ;;
+    *) fail "Système non reconnu. Installez Docker : https://docs.docker.com/get-docker/" ;;
+  esac
+}
+
+start_docker_daemon() {
+  if [[ "$(uname)" == "Darwin" ]]; then
+    info "Docker Desktop n'est pas démarré : lancement…"
+    open -a Docker 2>/dev/null || fail "Impossible de lancer Docker Desktop : ouvrez-le manuellement."
+  elif command -v systemctl >/dev/null 2>&1; then
+    info "Le service Docker n'est pas démarré : sudo systemctl start docker"
+    sudo systemctl start docker || true
+  fi
+}
+
+wait_for_docker() {
+  info "Attente de Docker (jusqu'à 3 minutes)…"
+  for _ in $(seq 1 90); do
+    docker info >/dev/null 2>&1 && return 0
+    sleep 2
+  done
+  return 1
+}
+
+# Vérifie Docker ; propose de l'installer s'il est absent, le démarre s'il est arrêté.
 check_docker() {
-  command -v docker >/dev/null 2>&1 || fail "Docker n'est pas installé : https://docs.docker.com/get-docker/"
-  docker info >/dev/null 2>&1 || fail "Docker ne répond pas : lancez Docker Desktop puis réessayez."
-  docker compose version >/dev/null 2>&1 || fail "Le plugin 'docker compose' est introuvable (Docker trop ancien ?)."
+  if ! command -v docker >/dev/null 2>&1; then
+    info "Docker n'est pas installé sur cette machine."
+    install_docker
+  fi
+  if ! docker info >/dev/null 2>&1; then
+    if docker info 2>&1 | grep -qi "permission denied"; then
+      fail "Accès à Docker refusé : ajoutez-vous au groupe docker (sudo usermod -aG docker \$USER) puis reconnectez-vous."
+    fi
+    start_docker_daemon
+    wait_for_docker || fail "Docker ne répond pas : lancez Docker Desktop manuellement puis relancez le script."
+  fi
+  docker compose version >/dev/null 2>&1 ||
+    fail "Le plugin 'docker compose' est introuvable : mettez Docker à jour (https://docs.docker.com/compose/install/)."
+}
+
+# Diagnostic seul (aucune action).
+check_only() {
+  local status=0
+  if command -v docker >/dev/null 2>&1; then
+    ok "Docker installé : $(docker --version)"
+    if docker info >/dev/null 2>&1; then ok "Docker est démarré"; else
+      printf '\033[1;31m✖ Docker est installé mais pas démarré\033[0m\n'
+      status=1
+    fi
+    if docker compose version >/dev/null 2>&1; then ok "$(docker compose version)"; else
+      printf '\033[1;31m✖ Plugin docker compose absent\033[0m\n'
+      status=1
+    fi
+  else
+    printf '\033[1;31m✖ Docker n'"'"'est pas installé (./start.sh proposera de l'"'"'installer)\033[0m\n'
+    status=1
+  fi
+  return $status
 }
 
 ensure_env() {
@@ -143,6 +230,7 @@ case "${1:-start}" in
     ok "Données de démonstration ajoutées (si la base était vide)."
     ;;
   backup) backup ;;
-  -h | --help | help) sed -n '3,14p' "$0" | sed 's/^# \{0,1\}//' ;;
+  check) check_only ;;
+  -h | --help | help) awk 'NR > 2 && /^# ====/ { exit } NR > 2' "$0" | sed 's/^# \{0,1\}//' ;;
   *) fail "Commande inconnue : $1 (voir ./start.sh help)" ;;
 esac
