@@ -8,3 +8,4 @@ backups
 playwright-report
 test-results
 .git
+local-data

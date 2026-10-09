@@ -18,7 +18,46 @@ Les choix d'architecture, le modèle de données et les ambiguïtés tranchées 
 
 ---
 
-## 1. Démarrage rapide avec Docker (recommandé)
+## 0. Démarrage le plus simple : SANS Docker (seul Node.js est nécessaire)
+
+Si Docker est difficile à installer sur votre poste, ce mode suffit pour un usage personnel.
+Le code de l'application est **exactement le même** : seule la façon de fournir PostgreSQL change.
+Une vraie base PostgreSQL 16 (même version que l'image Docker) est fournie par le projet
+(paquet npm `embedded-postgres`) : rien à installer sur le système à part Node.js.
+
+1. Installer **Node.js LTS** (version 22) : https://nodejs.org (installateur classique, « Suivant » partout).
+   Sous Windows, le lanceur propose aussi de l'installer automatiquement via `winget`.
+2. Lancer :
+
+   | Système | Démarrage |
+   |---|---|
+   | Windows | double-cliquer sur `start-local.cmd` |
+   | macOS / Linux | `./start-local.sh` (ou `bash start-local.sh`) |
+
+Au premier lancement (quelques minutes, connexion Internet nécessaire) le script installe les
+dépendances, crée la base, applique les migrations, installe les référentiels, construit l'application,
+puis ouvre le navigateur. Les lancements suivants prennent quelques secondes (la reconstruction n'a lieu
+que si le code a changé, par exemple après une mise à jour).
+
+**Laissez la fenêtre ouverte** pendant l'utilisation ; Ctrl+C (ou fermer la fenêtre) arrête l'application et la base.
+
+| Commande | Rôle |
+|---|---|
+| `start-local.cmd demo` / `./start-local.sh demo` | ajoute les données de démonstration (base vide uniquement) |
+| `start-local.cmd backup` / `./start-local.sh backup` | copie complète de la base et des pièces jointes dans `backups/` (application arrêtée) |
+
+Où sont les données ? Dans le dossier `crm/local-data/` (base + pièces jointes). **Ne pas le supprimer.**
+À chaque démarrage, une copie de sécurité de ce dossier est faite dans `crm/backups/auto/`
+(les 5 dernières sont conservées). Pour restaurer : application arrêtée, remplacer `local-data/` par
+une copie de `backups/…/local-data-…` (renommée en `local-data`).
+
+Sécurité : la base n'écoute que sur la machine elle-même (port 5433) avec un mot de passe aléatoire
+(`local-data/pg-password`) ; l'application est joignable depuis le réseau local (téléphone) sur le port 3000.
+
+Passer plus tard à Docker ou à un serveur : les deux modes ont des bases séparées. Le transfert se fait
+par un export PostgreSQL standard (`pg_dump` de la base locale, port 5433, puis `pg_restore`, voir section 4).
+
+## 1. Démarrage avec Docker (recommandé pour un serveur)
 
 Pré-requis : Docker Desktop (ou Docker Engine + plugin compose), démarré.
 
