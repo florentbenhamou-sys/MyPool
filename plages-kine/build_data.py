@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Intègre l'onglet « Calendrier » d'un emploi du temps xlsx dans index.html.
 
-Usage : python3 build_data.py Emploi_du_temps_BENHAMOU_Q1_Q2.xlsx [index.html]
+Usage : python3 build_data.py Emploi_du_temps_BENHAMOU_Q1_Q2.xlsx [modele.html] [sortie.html]
+(par défaut : index.html -> dist/index.html, dossier non versionné)
 
 Produit { "AAAA-MM-JJ": [[debut_min, fin_min, "matiere", "type"], ...] } pour les
 jours ouvrés du 12/10/2026 au 18/12/2026 et le place dans <script id="edt-data">.
@@ -58,6 +59,7 @@ def to_min(v):
 def main():
     src = Path(sys.argv[1])
     html = Path(sys.argv[2]) if len(sys.argv) > 2 else Path(__file__).with_name("index.html")
+    out = Path(sys.argv[3]) if len(sys.argv) > 3 else Path(__file__).parent / "dist" / "index.html"
     wb = openpyxl.load_workbook(src, data_only=True, read_only=True)
     ws = wb["Calendrier"]
     rows = ws.iter_rows(values_only=True)
@@ -100,9 +102,10 @@ def main():
     )
     if n != 1:
         sys.exit("Bloc <script id=\"edt-data\"> introuvable dans " + str(html))
-    html.write_text(new, encoding="utf-8")
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(new, encoding="utf-8")
     nb = sum(len(v) for v in data.values())
-    print(f"{nb} occupations sur {len(data)} jours intégrées dans {html} ({skipped} lignes ignorées)")
+    print(f"{nb} occupations sur {len(data)} jours intégrées dans {out} ({skipped} lignes ignorées)")
 
 
 if __name__ == "__main__":

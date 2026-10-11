@@ -1,5 +1,5 @@
 // Test de plages-kine/index.html dans Chromium à 390 × 844.
-// Usage : node tests/test.mjs [--fixture] [dossier_captures]
+// Usage : node tests/test.mjs [--fixture] [--page=chemin.html] [dossier_captures]
 //   --fixture : injecte un jeu d'occupations fictif qui reproduit le jeu de test
 //               (utile tant que le vrai emploi du temps n'est pas intégré).
 import { createRequire } from 'module';
@@ -36,7 +36,8 @@ const EXPECTED = {
   '2026-10-19': [['normale', '08:20', '11:59'], ['exceptionnelle', '12:00', '13:00'], ['normale', '13:01', '13:40'], ['normale', '15:20', '18:10']],
 };
 
-let src = path.resolve(here, '..', 'index.html');
+const pageArg = args.find(a => a.startsWith('--page='));
+let src = pageArg ? path.resolve(pageArg.slice(7)) : path.resolve(here, '..', 'index.html');
 if (useFixture) {
   const html = fs.readFileSync(src, 'utf8').replace(
     /(<script id="edt-data" type="application\/json">)[\s\S]*?(<\/script>)/,

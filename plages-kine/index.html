@@ -542,7 +542,7 @@ label.f input {
       var a = Math.max(A, o[0]), b = Math.min(B, o[1]);
       if (b <= a) return;
       var ht = Math.max(y(b) - y(a) - 2, 14);
-      var lbl = esc(o[2] || 'Occupation') + (o[3] === 'Médical' ? ' · médical' : '');
+      var lbl = esc(o[2] || o[3] || 'Occupation') + (o[3] === 'Médical' ? ' · médical' : '');
       h.push('<div class="blk occ" style="top:' + (y(a) + 1) + 'px;height:' + ht + 'px" title="' + lbl + '">' +
         '<b>' + lbl + '</b> <span class="t">' + hm(o[0]) + '–' + hm(o[1]) + '</span></div>');
     });
