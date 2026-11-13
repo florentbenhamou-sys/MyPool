@@ -1,0 +1,21 @@
+[
+  {
+    "slide": 1,
+    "title": "Conserver pour progresser",
+    "warnings": [
+      "moment: font reduced from 10.5 to 9.0 pt to fit"
+    ]
+  },
+  {
+    "slide": 2,
+    "title": "Circuit coordination et vitesse de réaction avec ballon au pied en fin de séance",
+    "warnings": [
+      "moment: font reduced from 10.5 to 9.0 pt to fit",
+      "title: text likely overflows its area even at 12.0 pt (2 estimated lines) — shorten it",
+      "rules: font reduced from 12.0 to 10.0 pt to fit",
+      "behaviours: missing",
+      "variables: missing",
+      "diagram: missing — template diagram removed"
+    ]
+  }
+]
